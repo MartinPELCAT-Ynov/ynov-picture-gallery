@@ -8,15 +8,15 @@ import {
 } from "react";
 import { MeQuery, useMeQuery } from "src/__generated__";
 
-type User = MeQuery["me"] | undefined;
+export type SessionUser = MeQuery["me"];
 
-type ContextValues = {
-  user: User;
-  setUser: Dispatch<SetStateAction<User>>;
+export type ISessionContext = {
+  user: SessionUser | undefined;
+  setUser: Dispatch<SetStateAction<SessionUser | undefined>>;
   loading: boolean;
 };
 
-export const SessionContext = createContext<ContextValues>(undefined!);
+export const SessionContext = createContext<ISessionContext>(undefined!);
 
 export const SessionContextProvider: FC = ({ children }) => {
   const [user, setUser] = useState<MeQuery["me"] | undefined>(undefined);

@@ -1,14 +1,30 @@
 query Me {
   me {
     ...userFields
-    roles
   }
 }
 
-mutation Login($username: String!, $password: String!) {
-  login(input: { username: $username, password: $password }) {
-    username
-    roles
+mutation Login($email: String!, $password: String!) {
+  login(input: { email: $email, password: $password }) {
+    ...userFields
+  }
+}
+
+mutation Register(
+  $firstName: String!
+  $lastName: String!
+  $email: String!
+  $password: String!
+) {
+  register(
+    input: {
+      firstName: $firstName
+      lastName: $lastName
+      email: $email
+      password: $password
+    }
+  ) {
+    ...userFields
   }
 }
 
@@ -16,5 +32,10 @@ fragment userFields on User {
   id
   firstName
   lastName
-  username
+  email
+  roles
+}
+
+mutation Logout {
+  logout
 }

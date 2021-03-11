@@ -15,19 +15,19 @@ import { Role, ROLE_ENUM } from "./Role";
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   @Field()
-  id!: number;
+  id!: string;
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
+  @Column()
+  @Field()
   firstName?: string;
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
+  @Column()
+  @Field()
   lastName?: string;
 
   @Column({ unique: true })
   @Field()
-  username!: string;
+  email!: string;
 
   @Column()
   password!: string;

@@ -14,8 +14,8 @@ import { InjectRepository } from "typeorm-typedi-extensions";
 import { getRepository, Repository } from "typeorm";
 import { Role } from "../entity/Role";
 import { KoaContext } from "server/types/koa-types";
-import { LoginInput } from "../inputs/user-inputs";
-import { compare } from "bcrypt";
+import { LoginInput, RegisterInput } from "../inputs/user-inputs";
+import { hashPassword, isValidPassword } from "../../utils/password-utils";
 
 @Service()
 @Resolver(() => User)
@@ -47,20 +47,38 @@ export class UserResolver {
 
   @Mutation(() => User)
   async login(
-    @Arg("input") { username, password }: LoginInput,
+    @Arg("input") { email, password }: LoginInput,
     @Ctx() { session }: KoaContext
-  ) {
+  ): Promise<User> {
     const userRepo = getRepository(User);
     const user = await userRepo.findOne({
-      where: { username },
+      where: { email },
       relations: ["roles"],
     });
 
     if (!user) throw new Error("User not found");
-    const isValid = await compare(password, user.password);
+    const isValid = await isValidPassword(password, user.password);
     if (!isValid) throw new Error("User not found");
     user.password = undefined!;
     session!.user = user;
     return user;
+  }
+
+  @Mutation(() => User)
+  async register(
+    @Arg("input") args: RegisterInput,
+    @Ctx() { session }: KoaContext
+  ): Promise<User> {
+    args.password = await hashPassword(args.password);
+    const user = User.create(args);
+    user.password = undefined!;
+    session!.user = user;
+    return user.save();
+  }
+
+  @Mutation(() => Boolean)
+  async logout(@Ctx() req: KoaContext) {
+    req.session = null;
+    return true;
   }
 }

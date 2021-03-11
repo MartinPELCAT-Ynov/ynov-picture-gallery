@@ -25,10 +25,10 @@ export type Query = {
 
 export type User = {
   __typename?: "User";
-  id: Scalars["Float"];
-  firstName?: Maybe<Scalars["String"]>;
-  lastName?: Maybe<Scalars["String"]>;
-  username: Scalars["String"];
+  id: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  email: Scalars["String"];
   roles: Array<RolesEnum>;
 };
 
@@ -42,35 +42,66 @@ export enum RolesEnum {
 export type Mutation = {
   __typename?: "Mutation";
   login: User;
+  register: User;
+  logout: Scalars["Boolean"];
 };
 
 export type MutationLoginArgs = {
   input: LoginInput;
 };
 
+export type MutationRegisterArgs = {
+  input: RegisterInput;
+};
+
 export type LoginInput = {
-  username: Scalars["String"];
+  email: Scalars["String"];
+  password: Scalars["String"];
+};
+
+export type RegisterInput = {
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  email: Scalars["String"];
   password: Scalars["String"];
 };
 
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MeQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "roles"> & UserFieldsFragment;
+  me: { __typename?: "User" } & UserFieldsFragment;
 };
 
 export type LoginMutationVariables = Exact<{
-  username: Scalars["String"];
+  email: Scalars["String"];
   password: Scalars["String"];
 }>;
 
 export type LoginMutation = { __typename?: "Mutation" } & {
-  login: { __typename?: "User" } & Pick<User, "username" | "roles">;
+  login: { __typename?: "User" } & UserFieldsFragment;
+};
+
+export type RegisterMutationVariables = Exact<{
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  email: Scalars["String"];
+  password: Scalars["String"];
+}>;
+
+export type RegisterMutation = { __typename?: "Mutation" } & {
+  register: { __typename?: "User" } & UserFieldsFragment;
 };
 
 export type UserFieldsFragment = { __typename?: "User" } & Pick<
   User,
-  "id" | "firstName" | "lastName" | "username"
+  "id" | "firstName" | "lastName" | "email" | "roles"
+>;
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
+
+export type LogoutMutation = { __typename?: "Mutation" } & Pick<
+  Mutation,
+  "logout"
 >;
 
 export const UserFieldsFragmentDoc = gql`
@@ -78,14 +109,14 @@ export const UserFieldsFragmentDoc = gql`
     id
     firstName
     lastName
-    username
+    email
+    roles
   }
 `;
 export const MeDocument = gql`
   query Me {
     me {
       ...userFields
-      roles
     }
   }
   ${UserFieldsFragmentDoc}
@@ -123,12 +154,12 @@ export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const LoginDocument = gql`
-  mutation Login($username: String!, $password: String!) {
-    login(input: { username: $username, password: $password }) {
-      username
-      roles
+  mutation Login($email: String!, $password: String!) {
+    login(input: { email: $email, password: $password }) {
+      ...userFields
     }
   }
+  ${UserFieldsFragmentDoc}
 `;
 export type LoginMutationFn = Apollo.MutationFunction<
   LoginMutation,
@@ -148,7 +179,7 @@ export type LoginMutationFn = Apollo.MutationFunction<
  * @example
  * const [loginMutation, { data, loading, error }] = useLoginMutation({
  *   variables: {
- *      username: // value for 'username'
+ *      email: // value for 'email'
  *      password: // value for 'password'
  *   },
  * });
@@ -169,4 +200,109 @@ export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<
   LoginMutation,
   LoginMutationVariables
+>;
+export const RegisterDocument = gql`
+  mutation Register(
+    $firstName: String!
+    $lastName: String!
+    $email: String!
+    $password: String!
+  ) {
+    register(
+      input: {
+        firstName: $firstName
+        lastName: $lastName
+        email: $email
+        password: $password
+      }
+    ) {
+      ...userFields
+    }
+  }
+  ${UserFieldsFragmentDoc}
+`;
+export type RegisterMutationFn = Apollo.MutationFunction<
+  RegisterMutation,
+  RegisterMutationVariables
+>;
+
+/**
+ * __useRegisterMutation__
+ *
+ * To run a mutation, you first call `useRegisterMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRegisterMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [registerMutation, { data, loading, error }] = useRegisterMutation({
+ *   variables: {
+ *      firstName: // value for 'firstName'
+ *      lastName: // value for 'lastName'
+ *      email: // value for 'email'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useRegisterMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RegisterMutation,
+    RegisterMutationVariables
+  >
+) {
+  return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(
+    RegisterDocument,
+    baseOptions
+  );
+}
+export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
+export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
+export type RegisterMutationOptions = Apollo.BaseMutationOptions<
+  RegisterMutation,
+  RegisterMutationVariables
+>;
+export const LogoutDocument = gql`
+  mutation Logout {
+    logout
+  }
+`;
+export type LogoutMutationFn = Apollo.MutationFunction<
+  LogoutMutation,
+  LogoutMutationVariables
+>;
+
+/**
+ * __useLogoutMutation__
+ *
+ * To run a mutation, you first call `useLogoutMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLogoutMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [logoutMutation, { data, loading, error }] = useLogoutMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLogoutMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    LogoutMutation,
+    LogoutMutationVariables
+  >
+) {
+  return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(
+    LogoutDocument,
+    baseOptions
+  );
+}
+export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
+export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
+export type LogoutMutationOptions = Apollo.BaseMutationOptions<
+  LogoutMutation,
+  LogoutMutationVariables
 >;
