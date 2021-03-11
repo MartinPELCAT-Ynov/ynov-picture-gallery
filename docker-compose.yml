@@ -1,0 +1,26 @@
+services:
+  postgres_database:
+    container_name: postgres-gallery-gallery
+    image: postgres
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: picture-gallery
+
+  redis:
+    container_name: redis-container-gallery
+    image: redis
+    restart: always
+    ports:
+      - 6380:6379
+
+  fake-smtp:
+    image: ghusta/fakesmtp:2.0
+    container_name: fake-smtp
+    ports: 
+      - "25:25"
+    volumes:
+      - ~/tmp/fakemail:/var/mail

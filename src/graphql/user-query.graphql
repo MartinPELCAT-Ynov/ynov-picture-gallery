@@ -1,0 +1,20 @@
+query Me {
+  me {
+    ...userFields
+    roles
+  }
+}
+
+mutation Login($username: String!, $password: String!) {
+  login(input: { username: $username, password: $password }) {
+    username
+    roles
+  }
+}
+
+fragment userFields on User {
+  id
+  firstName
+  lastName
+  username
+}
