@@ -13,7 +13,7 @@ type FormDatas = { email: string; password: string };
 
 export default function Login() {
   const [login, { error, loading }] = useLoginMutation();
-  const { push } = useRouter();
+  const { push, query } = useRouter();
 
   const { setUser } = useContext(SessionContext);
 
@@ -36,6 +36,11 @@ export default function Login() {
           <span className="text-3xl font-bold">Log In</span>
         </div>
         <div className="p-4">
+          {query.validation && (
+            <div className="mb-2 bg-gray-100 rounded-md border border-gray-400 p-2 text-sm">
+              You received a validation email to activate your account
+            </div>
+          )}
           <Form onSubmit={handleSubmit}>
             <FormRow>
               <Input.Default label="Email" name="email" required />

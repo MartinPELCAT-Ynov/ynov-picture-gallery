@@ -24,7 +24,7 @@ mutation Register(
       password: $password
     }
   ) {
-    ...userFields
+    success
   }
 }
 
@@ -37,5 +37,13 @@ fragment userFields on User {
 }
 
 mutation Logout {
-  logout
+  logout {
+    success
+  }
+}
+
+mutation ValidateEmail($key: String!) {
+  validateEmail(key: $key) {
+    success
+  }
 }

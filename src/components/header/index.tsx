@@ -1,6 +1,13 @@
 import clsx from "clsx";
 import Link from "next/link";
-import { useContext, useRef, useState } from "react";
+import {
+  DetailedHTMLProps,
+  FC,
+  HTMLAttributes,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 import { SessionContext, SessionUser } from "src/contexts/session-context";
 import { Logo } from "../logo";
 import { useClickAway } from "react-use";
@@ -9,7 +16,7 @@ import { useLogoutMutation } from "src/__generated__";
 export const Header = () => {
   return (
     <div className="flex shadow-md bg-white text-gray-800 justify-between items-center px-3">
-      <Link href="/mcms-admin">
+      <Link href="/">
         <a className="py-3">
           <div className="flex space-x-2 items-center">
             <div>
@@ -42,14 +49,14 @@ const ConnectedStatus = ({ firstName, lastName }: SessionUser) => {
       <div
         role="button"
         onClick={() => setOpen((isOpen) => !isOpen)}
-        className="py-1 px-2 border-b-2 border-opacity-0 border-black font-semibold hover:border-opacity-100 duration-300 transition hover:-translate-x-1"
+        className="py-1 px-2 border-b-2 border-opacity-0 border-black font-semibold hover:border-opacity-100 duration-300 transition"
       >
         {firstName} {lastName}
       </div>
       <div
         className={clsx(
           !open && "hidden",
-          "bg-white p-1 shadow-md absolute top-7 left-0 right-0 border rounded-md"
+          "bg-white p-1 shadow-md absolute top-14 right-0 border rounded-md w-60 space-y-1"
         )}
       >
         <DropDown />
@@ -69,12 +76,27 @@ const DropDown = () => {
     } catch (error) {}
   };
   return (
+    <>
+      <Link href="/profile">
+        <a>
+          <DropDownItem>Profile</DropDownItem>
+        </a>
+      </Link>
+      <DropDownItem onClick={handleLogOut}>Log Out </DropDownItem>
+    </>
+  );
+};
+
+const DropDownItem: FC<
+  DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>
+> = ({ children, ...props }) => {
+  return (
     <div
       role="button"
-      onClick={handleLogOut}
-      className=" p-2 hover:bg-gray-200 rounded-md"
+      {...props}
+      className="p-2 bg-opacity-0 hover:bg-opacity-100 hover:bg-gray-200 rounded-md duration-300 transition"
     >
-      Log Out
+      {children}
     </div>
   );
 };
@@ -82,7 +104,7 @@ const DropDown = () => {
 const NotConnectedStatus = () => {
   return (
     <Link href="/auth/login">
-      <a className="py-1 px-2 border-b-2 border-opacity-0 border-black font-semibold hover:border-opacity-100 duration-300 transition hover:-translate-x-1">
+      <a className="py-1 px-2 border-b-2 border-opacity-0 border-black font-semibold hover:border-opacity-100 duration-300 transition">
         Se connecter
       </a>
     </Link>

@@ -1,11 +1,10 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { FormEvent, useContext } from "react";
+import { FormEvent } from "react";
 import { Button } from "src/components/forms/Button";
 import { Form } from "src/components/forms/Form";
 import { FormRow } from "src/components/forms/form-row";
 import { Input } from "src/components/forms/Input";
-import { SessionContext } from "src/contexts/session-context";
 import { generateFormDatas } from "src/utils/form-utils";
 import { useRegisterMutation } from "src/__generated__";
 
@@ -18,15 +17,13 @@ type FormDatas = {
 
 export default function Register() {
   const [register, { loading, error }] = useRegisterMutation();
-  const { setUser } = useContext(SessionContext);
   const { push } = useRouter();
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
       const datas = generateFormDatas<FormDatas>(e.currentTarget);
-      const { data } = await register({ variables: datas });
-      setUser(data?.register);
-      push("/");
+      await register({ variables: datas });
+      push("/auth/login?validation=true");
     } catch (error) {
       //DO NOTHING
     }
@@ -65,7 +62,7 @@ export default function Register() {
             <div className="flex justify-end">
               <Link href="/auth/login">
                 <a className="text-blue-600 hover:underline text-sm">
-                  Already reistered? Login !
+                  Already registered? Login !
                 </a>
               </Link>
             </div>

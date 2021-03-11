@@ -32,6 +32,9 @@ export class User extends BaseEntity {
   @Column()
   password!: string;
 
+  @Column("boolean", { default: false })
+  isActivated!: boolean;
+
   @ManyToMany(() => Role)
   @Field(() => [ROLE_ENUM])
   @JoinTable()

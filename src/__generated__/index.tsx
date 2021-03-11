@@ -19,8 +19,8 @@ export type Scalars = {
 
 export type Query = {
   __typename?: "Query";
-  users?: Maybe<Array<User>>;
   me: User;
+  users?: Maybe<Array<User>>;
 };
 
 export type User = {
@@ -42,8 +42,9 @@ export enum RolesEnum {
 export type Mutation = {
   __typename?: "Mutation";
   login: User;
-  register: User;
-  logout: Scalars["Boolean"];
+  register: SucessObject;
+  logout: SucessObject;
+  validateEmail: SucessObject;
 };
 
 export type MutationLoginArgs = {
@@ -54,9 +55,18 @@ export type MutationRegisterArgs = {
   input: RegisterInput;
 };
 
+export type MutationValidateEmailArgs = {
+  key: Scalars["String"];
+};
+
 export type LoginInput = {
   email: Scalars["String"];
   password: Scalars["String"];
+};
+
+export type SucessObject = {
+  __typename?: "SucessObject";
+  success: Scalars["Boolean"];
 };
 
 export type RegisterInput = {
@@ -89,7 +99,7 @@ export type RegisterMutationVariables = Exact<{
 }>;
 
 export type RegisterMutation = { __typename?: "Mutation" } & {
-  register: { __typename?: "User" } & UserFieldsFragment;
+  register: { __typename?: "SucessObject" } & Pick<SucessObject, "success">;
 };
 
 export type UserFieldsFragment = { __typename?: "User" } & Pick<
@@ -99,10 +109,20 @@ export type UserFieldsFragment = { __typename?: "User" } & Pick<
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
 
-export type LogoutMutation = { __typename?: "Mutation" } & Pick<
-  Mutation,
-  "logout"
->;
+export type LogoutMutation = { __typename?: "Mutation" } & {
+  logout: { __typename?: "SucessObject" } & Pick<SucessObject, "success">;
+};
+
+export type ValidateEmailMutationVariables = Exact<{
+  key: Scalars["String"];
+}>;
+
+export type ValidateEmailMutation = { __typename?: "Mutation" } & {
+  validateEmail: { __typename?: "SucessObject" } & Pick<
+    SucessObject,
+    "success"
+  >;
+};
 
 export const UserFieldsFragmentDoc = gql`
   fragment userFields on User {
@@ -216,10 +236,9 @@ export const RegisterDocument = gql`
         password: $password
       }
     ) {
-      ...userFields
+      success
     }
   }
-  ${UserFieldsFragmentDoc}
 `;
 export type RegisterMutationFn = Apollo.MutationFunction<
   RegisterMutation,
@@ -265,7 +284,9 @@ export type RegisterMutationOptions = Apollo.BaseMutationOptions<
 >;
 export const LogoutDocument = gql`
   mutation Logout {
-    logout
+    logout {
+      success
+    }
   }
 `;
 export type LogoutMutationFn = Apollo.MutationFunction<
@@ -305,4 +326,52 @@ export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<
   LogoutMutation,
   LogoutMutationVariables
+>;
+export const ValidateEmailDocument = gql`
+  mutation ValidateEmail($key: String!) {
+    validateEmail(key: $key) {
+      success
+    }
+  }
+`;
+export type ValidateEmailMutationFn = Apollo.MutationFunction<
+  ValidateEmailMutation,
+  ValidateEmailMutationVariables
+>;
+
+/**
+ * __useValidateEmailMutation__
+ *
+ * To run a mutation, you first call `useValidateEmailMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useValidateEmailMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [validateEmailMutation, { data, loading, error }] = useValidateEmailMutation({
+ *   variables: {
+ *      key: // value for 'key'
+ *   },
+ * });
+ */
+export function useValidateEmailMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ValidateEmailMutation,
+    ValidateEmailMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    ValidateEmailMutation,
+    ValidateEmailMutationVariables
+  >(ValidateEmailDocument, baseOptions);
+}
+export type ValidateEmailMutationHookResult = ReturnType<
+  typeof useValidateEmailMutation
+>;
+export type ValidateEmailMutationResult = Apollo.MutationResult<ValidateEmailMutation>;
+export type ValidateEmailMutationOptions = Apollo.BaseMutationOptions<
+  ValidateEmailMutation,
+  ValidateEmailMutationVariables
 >;
