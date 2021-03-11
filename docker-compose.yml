@@ -20,7 +20,7 @@ services:
   fake-smtp:
     image: ghusta/fakesmtp:2.0
     container_name: fake-smtp
-    ports: 
+    ports:
       - "25:25"
     volumes:
       - ~/tmp/fakemail:/var/mail

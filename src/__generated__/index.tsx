@@ -1,9 +1,13 @@
-import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import { gql } from "@apollo/client";
+import * as Apollo from "@apollo/client";
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
+  { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
+  { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -14,89 +18,78 @@ export type Scalars = {
 };
 
 export type Query = {
-  __typename?: 'Query';
+  __typename?: "Query";
   users?: Maybe<Array<User>>;
   me: User;
 };
 
 export type User = {
-  __typename?: 'User';
-  id: Scalars['Float'];
-  firstName?: Maybe<Scalars['String']>;
-  lastName?: Maybe<Scalars['String']>;
-  username: Scalars['String'];
+  __typename?: "User";
+  id: Scalars["Float"];
+  firstName?: Maybe<Scalars["String"]>;
+  lastName?: Maybe<Scalars["String"]>;
+  username: Scalars["String"];
   roles: Array<RolesEnum>;
 };
 
 export enum RolesEnum {
-  Admin = 'ADMIN',
-  Read = 'READ',
-  Write = 'WRITE',
-  User = 'USER'
+  Admin = "ADMIN",
+  Read = "READ",
+  Write = "WRITE",
+  User = "USER",
 }
 
 export type Mutation = {
-  __typename?: 'Mutation';
+  __typename?: "Mutation";
   login: User;
 };
-
 
 export type MutationLoginArgs = {
   input: LoginInput;
 };
 
 export type LoginInput = {
-  username: Scalars['String'];
-  password: Scalars['String'];
+  username: Scalars["String"];
+  password: Scalars["String"];
 };
 
-export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
-
-export type MeQuery = (
-  { __typename?: 'Query' }
-  & { me: (
-    { __typename?: 'User' }
-    & Pick<User, 'roles'>
-    & UserFieldsFragment
-  ) }
-);
+export type MeQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Pick<User, "roles"> & UserFieldsFragment;
+};
 
 export type LoginMutationVariables = Exact<{
-  username: Scalars['String'];
-  password: Scalars['String'];
+  username: Scalars["String"];
+  password: Scalars["String"];
 }>;
 
+export type LoginMutation = { __typename?: "Mutation" } & {
+  login: { __typename?: "User" } & Pick<User, "username" | "roles">;
+};
 
-export type LoginMutation = (
-  { __typename?: 'Mutation' }
-  & { login: (
-    { __typename?: 'User' }
-    & Pick<User, 'username' | 'roles'>
-  ) }
-);
-
-export type UserFieldsFragment = (
-  { __typename?: 'User' }
-  & Pick<User, 'id' | 'firstName' | 'lastName' | 'username'>
-);
+export type UserFieldsFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "firstName" | "lastName" | "username"
+>;
 
 export const UserFieldsFragmentDoc = gql`
-    fragment userFields on User {
-  id
-  firstName
-  lastName
-  username
-}
-    `;
-export const MeDocument = gql`
-    query Me {
-  me {
-    ...userFields
-    roles
+  fragment userFields on User {
+    id
+    firstName
+    lastName
+    username
   }
-}
-    ${UserFieldsFragmentDoc}`;
+`;
+export const MeDocument = gql`
+  query Me {
+    me {
+      ...userFields
+      roles
+    }
+  }
+  ${UserFieldsFragmentDoc}
+`;
 
 /**
  * __useMeQuery__
@@ -113,24 +106,34 @@ export const MeDocument = gql`
  *   },
  * });
  */
-export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
-        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
-      }
-export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
-          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
-        }
+export function useMeQuery(
+  baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>
+) {
+  return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
+}
+export function useMeLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>
+) {
+  return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(
+    MeDocument,
+    baseOptions
+  );
+}
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const LoginDocument = gql`
-    mutation Login($username: String!, $password: String!) {
-  login(input: {username: $username, password: $password}) {
-    username
-    roles
+  mutation Login($username: String!, $password: String!) {
+    login(input: { username: $username, password: $password }) {
+      username
+      roles
+    }
   }
-}
-    `;
-export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
+`;
+export type LoginMutationFn = Apollo.MutationFunction<
+  LoginMutation,
+  LoginMutationVariables
+>;
 
 /**
  * __useLoginMutation__
@@ -150,9 +153,20 @@ export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutati
  *   },
  * });
  */
-export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
-        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, baseOptions);
-      }
+export function useLoginMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    LoginMutation,
+    LoginMutationVariables
+  >
+) {
+  return Apollo.useMutation<LoginMutation, LoginMutationVariables>(
+    LoginDocument,
+    baseOptions
+  );
+}
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<
+  LoginMutation,
+  LoginMutationVariables
+>;
