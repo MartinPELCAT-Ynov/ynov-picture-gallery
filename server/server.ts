@@ -32,10 +32,6 @@ export const server = async () => {
 
       server.use(bodyParser());
       server.use(sessionMiddleware(server));
-      server.use(async (ctx, next) => {
-        ctx.req.session = ctx.session; // Add session to req to be accessible in nextJS pages
-        return next();
-      });
 
       const schema = await buildSchema({
         resolvers,
@@ -55,8 +51,8 @@ export const server = async () => {
 
       // Add all routes
       // server
-      //   .use(installerController.routes())
-      //   .use(installerController.allowedMethods());
+      //   .use(exampleController.routes())
+      //   .use(exampleController.allowedMethods());
 
       apollo.applyMiddleware({ app: server, path: "/api/gql" });
       server.use(nextRoutes.routes()).use(nextRoutes.allowedMethods());
