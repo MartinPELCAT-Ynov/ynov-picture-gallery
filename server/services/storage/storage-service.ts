@@ -9,6 +9,10 @@ import {
 export class StorageService {
   private _strategy!: IStorageStrategy;
 
+  constructor() {
+    console.log("StorageService constructor");
+  }
+
   public strategy(key: keyof AvailableStrategies): StorageService {
     this._strategy = availableStrategies[key];
     return this;
