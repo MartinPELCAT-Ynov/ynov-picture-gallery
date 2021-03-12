@@ -8,16 +8,17 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { User } from ".";
+import { Lazy } from "../helpers";
 import { ReactionableEntity } from "./LikeableEntity";
 
 @ObjectType()
 @Entity()
 export class Comment {
   @PrimaryColumn("uuid")
-  @ManyToOne(() => ReactionableEntity, (lk) => lk.uuid)
+  @ManyToOne(() => ReactionableEntity, (lk) => lk.uuid, { lazy: true })
   @JoinColumn({ name: "entity_uuid" })
-  @Field()
-  entity_uuid!: string;
+  @Field(() => ReactionableEntity)
+  entity_uuid!: Lazy<ReactionableEntity>;
 
   @PrimaryGeneratedColumn("uuid")
   @Field()
@@ -25,7 +26,7 @@ export class Comment {
 
   @ManyToOne(() => User, { lazy: true })
   @Field(() => User)
-  user!: User;
+  user!: Lazy<User>;
 
   @Field()
   @Column()

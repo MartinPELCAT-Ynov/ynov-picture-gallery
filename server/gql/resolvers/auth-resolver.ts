@@ -49,7 +49,8 @@ export class AuthResolver {
     @Ctx() req: KoaContext
   ): Promise<SucessObject> {
     args.password = await hashPassword(args.password);
-    const user = await this.userRepository.create(args).save();
+    const user = this.userRepository.create(args);
+    await this.userRepository.save(user);
     await this.emailService.sendRegisterConfirmation(user, req.origin);
     return { success: true };
   }
@@ -75,7 +76,7 @@ export class AuthResolver {
     if (!user) throw new Error("This key in not valid");
     if (user.isActivated) return { success: true };
     user.isActivated = true;
-    await user.save();
+    await this.userRepository.save(user);
     return { success: true };
   }
 }

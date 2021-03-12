@@ -1,4 +1,4 @@
-import { Destination, Album } from ".";
+import { Destination, Album, User } from ".";
 import { Field, ObjectType } from "type-graphql";
 import {
   Column,
@@ -15,10 +15,10 @@ import { ReactionableEntity } from "./LikeableEntity";
 @Entity()
 export class Travel {
   @PrimaryColumn("uuid")
-  @ManyToOne(() => ReactionableEntity, (lk) => lk.uuid)
+  @ManyToOne(() => ReactionableEntity, (lk) => lk.uuid, { lazy: true })
   @JoinColumn({ name: "uuid" })
-  @Field()
-  uuid!: string;
+  @Field(() => ReactionableEntity)
+  uuid!: Lazy<ReactionableEntity>;
 
   @Column()
   @Field()
@@ -37,4 +37,8 @@ export class Travel {
   @OneToMany(() => Album, (album) => album.travel, { lazy: true })
   @Field(() => [Album])
   albums!: Lazy<Album[]>;
+
+  @ManyToOne(() => User, (user) => user.travels, { lazy: true })
+  @Field(() => User)
+  user!: Lazy<User>;
 }
