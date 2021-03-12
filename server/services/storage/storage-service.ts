@@ -9,24 +9,31 @@ import {
 export class StorageService {
   private _strategy!: IStorageStrategy;
 
-  public strategy(v: keyof AvailableStrategies): StorageService {
-    this._strategy = availableStrategies[v];
+  public strategy(key: keyof AvailableStrategies): StorageService {
+    this._strategy = availableStrategies[key];
     return this;
   }
 
+  private getStrategy(): IStorageStrategy {
+    if (!this._strategy) {
+      this._strategy = availableStrategies["local"];
+    }
+    return this._strategy;
+  }
+
   async uploadPhotos() {
-    return this._strategy.uploadPhotos();
+    return this.getStrategy().uploadPhotos();
   }
 
   async getPhotos() {
-    return this._strategy.getPhotos();
+    return this.getStrategy().getPhotos();
   }
 }
 
 const main = async () => {
   try {
     const storageService = new StorageService();
-    await storageService.strategy("firebase").uploadPhotos();
+    await storageService.strategy("local").uploadPhotos();
   } catch (error: any) {
     console.error(error.message);
   }
