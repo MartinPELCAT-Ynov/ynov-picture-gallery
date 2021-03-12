@@ -1,19 +1,23 @@
-import { IReaction, Photo, Like, Comment } from ".";
+import { Photo } from ".";
 import {
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
 import { Travel } from "./Travel";
+import { ReactionableEntity } from "./LikeableEntity";
 
 @ObjectType()
 @Entity()
-export class Destination implements IReaction {
-  @PrimaryGeneratedColumn("uuid")
+export class Destination {
+  @PrimaryColumn("uuid")
+  @ManyToOne(() => ReactionableEntity, (lk) => lk.uuid)
+  @JoinColumn({ name: "uuid" })
   @Field()
   uuid!: string;
 
@@ -31,13 +35,11 @@ export class Destination implements IReaction {
 
   location: any; //Voir comment faire: geohash ou longitude et latitudes
 
-  @ManyToMany(() => Photo)
+  @ManyToMany(() => Photo, (photo) => photo.uuid, { lazy: true })
   @JoinTable()
+  @Field(() => [Photo])
   illustrations!: Photo[];
 
   @ManyToOne(() => Travel, (trvl) => trvl.destinations)
   travel!: Travel;
-
-  likes!: Like[];
-  comments!: Comment[];
 }

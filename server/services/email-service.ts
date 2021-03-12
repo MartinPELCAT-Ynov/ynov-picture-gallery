@@ -9,7 +9,7 @@ import { Service } from "typedi";
 @Service()
 export class EmailService {
   async sendRegisterConfirmation(user: User, baseUrl: string) {
-    const plain = `${user.id}${BASE64_SEPARATOR}${user.email}`;
+    const plain = `${user.uuid}${BASE64_SEPARATOR}${user.email}`;
     const buff = Buffer.from(plain, "ascii");
     const validationUrl = `${baseUrl}/email-validation/${buff.toString(
       "base64"

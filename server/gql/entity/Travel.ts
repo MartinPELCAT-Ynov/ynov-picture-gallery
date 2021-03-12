@@ -1,13 +1,22 @@
-import { IReaction, Comment, Like, Destination, Album } from ".";
-
+import { Destination, Album } from ".";
 import { Field, ObjectType } from "type-graphql";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+} from "typeorm";
 import { Lazy } from "../helpers";
+import { ReactionableEntity } from "./LikeableEntity";
 
 @ObjectType()
 @Entity()
-export class Travel implements IReaction {
-  @PrimaryGeneratedColumn("uuid")
+export class Travel {
+  @PrimaryColumn("uuid")
+  @ManyToOne(() => ReactionableEntity, (lk) => lk.uuid)
+  @JoinColumn({ name: "uuid" })
   @Field()
   uuid!: string;
 
@@ -28,7 +37,4 @@ export class Travel implements IReaction {
   @OneToMany(() => Album, (album) => album.travel, { lazy: true })
   @Field(() => [Album])
   albums!: Lazy<Album[]>;
-
-  likes!: Like[];
-  comments!: Comment[];
 }

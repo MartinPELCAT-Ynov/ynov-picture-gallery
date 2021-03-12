@@ -13,7 +13,7 @@ export const DB_CONFIG: PostgresConnectionOptions = {
   port: 5433,
   logging: false,
   synchronize: true,
-  // dropSchema: true,
+  dropSchema: true,
   entities: [join(__dirname, "..", "gql/entity/**/*{.ts,.js}")],
   migrations: [join(__dirname, "..", "gql/migration/**/*{.ts,.js}")],
   subscribers: [join(__dirname, "..", "gql/subscriber/**/*{.ts,.js}")],

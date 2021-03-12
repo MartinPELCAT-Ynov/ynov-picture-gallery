@@ -7,7 +7,7 @@ import { Lazy } from "../helpers";
 @Entity()
 export class AlbumInvitation {
   @PrimaryGeneratedColumn("uuid")
-  public readonly id!: string;
+  public readonly uuid!: string;
 
   @ManyToOne(() => Album, (album) => album.albumInvitations, { lazy: true })
   album!: Lazy<Album>;

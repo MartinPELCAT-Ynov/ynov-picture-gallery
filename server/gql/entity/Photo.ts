@@ -1,19 +1,17 @@
 import { Field, ObjectType } from "type-graphql";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { IReaction, Comment } from ".";
-import { Like } from "./Like";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { ReactionableEntity } from "./LikeableEntity";
 
 @ObjectType()
 @Entity()
-export class Photo implements IReaction {
-  @PrimaryGeneratedColumn("uuid")
+export class Photo {
+  @PrimaryColumn("uuid")
+  @ManyToOne(() => ReactionableEntity, (lk) => lk.uuid)
+  @JoinColumn({ name: "uuid" })
   @Field()
   uuid!: string;
 
   @Column()
   @Field()
   url!: string;
-
-  likes!: Like[];
-  comments!: Comment[];
 }
