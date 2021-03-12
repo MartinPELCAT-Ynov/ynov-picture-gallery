@@ -18,9 +18,9 @@ import { Lazy } from "../helpers";
 export class Destination {
   @PrimaryColumn("uuid")
   @ManyToOne(() => ReactionableEntity, (lk) => lk.uuid, { lazy: true })
-  @JoinColumn({ name: "uuid" })
+  @JoinColumn({ name: "entity" })
   @Field(() => ReactionableEntity)
-  uuid!: Lazy<ReactionableEntity>;
+  entity!: Lazy<ReactionableEntity>;
 
   @Column()
   @Field()
@@ -36,7 +36,7 @@ export class Destination {
 
   location: any; //Voir comment faire: geohash ou longitude et latitudes
 
-  @ManyToMany(() => Photo, (photo) => photo.uuid, { lazy: true })
+  @ManyToMany(() => Photo, (photo) => photo.entity, { lazy: true })
   @JoinTable()
   @Field(() => [Photo])
   illustrations!: Photo[];

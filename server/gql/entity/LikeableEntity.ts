@@ -1,4 +1,4 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import { Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Lazy } from "../helpers";
 import { Comment } from "./Comment";
@@ -8,6 +8,7 @@ import { Like } from "./Like";
 @ObjectType()
 export class ReactionableEntity {
   @PrimaryGeneratedColumn("uuid")
+  @Field()
   uuid!: string;
 
   @OneToMany(() => Like, (like) => like.entity_uuid, { lazy: true })
@@ -17,4 +18,10 @@ export class ReactionableEntity {
   @OneToMany(() => Comment, (cmt) => cmt.entity_uuid, { lazy: true })
   @Field(() => [Comment])
   comments!: Lazy<Comment[]>;
+
+  @Field(() => Int)
+  likesCount!: number;
+
+  @Field(() => Int)
+  commentCount!: number;
 }

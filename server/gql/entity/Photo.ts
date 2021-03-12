@@ -8,9 +8,9 @@ import { ReactionableEntity } from "./LikeableEntity";
 export class Photo {
   @PrimaryColumn("uuid")
   @ManyToOne(() => ReactionableEntity, (lk) => lk.uuid, { lazy: true })
-  @JoinColumn({ name: "uuid" })
+  @JoinColumn({ name: "entity" })
   @Field(() => ReactionableEntity)
-  uuid!: Lazy<ReactionableEntity>;
+  entity!: Lazy<ReactionableEntity>;
 
   @Column()
   @Field()

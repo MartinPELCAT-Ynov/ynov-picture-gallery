@@ -18,10 +18,10 @@ import { Travel } from "./Travel";
 @Entity()
 export class Album {
   @PrimaryColumn("uuid")
-  @ManyToOne(() => ReactionableEntity, (lk) => lk.uuid)
-  @JoinColumn({ name: "uuid" })
-  @Field()
-  uuid!: string;
+  @ManyToOne(() => ReactionableEntity, (lk) => lk.uuid, { lazy: true })
+  @JoinColumn({ name: "entity" })
+  @Field(() => ReactionableEntity)
+  entity!: Lazy<ReactionableEntity>;
 
   @Column("boolean")
   @Field()
