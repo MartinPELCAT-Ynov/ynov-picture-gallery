@@ -32,7 +32,6 @@ export class AuthResolver {
   ): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { email },
-      relations: ["roles"],
     });
 
     if (!user) throw new Error("User not found");

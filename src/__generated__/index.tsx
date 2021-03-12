@@ -29,15 +29,7 @@ export type User = {
   firstName: Scalars["String"];
   lastName: Scalars["String"];
   email: Scalars["String"];
-  roles: Array<RolesEnum>;
 };
-
-export enum RolesEnum {
-  Admin = "ADMIN",
-  Read = "READ",
-  Write = "WRITE",
-  User = "USER",
-}
 
 export type Mutation = {
   __typename?: "Mutation";
@@ -104,7 +96,7 @@ export type RegisterMutation = { __typename?: "Mutation" } & {
 
 export type UserFieldsFragment = { __typename?: "User" } & Pick<
   User,
-  "id" | "firstName" | "lastName" | "email" | "roles"
+  "id" | "firstName" | "lastName" | "email"
 >;
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
@@ -130,7 +122,6 @@ export const UserFieldsFragmentDoc = gql`
     firstName
     lastName
     email
-    roles
   }
 `;
 export const MeDocument = gql`
