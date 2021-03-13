@@ -15,19 +15,84 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
+  DateTime: any;
 };
 
 export type Query = {
   __typename?: "Query";
   me: User;
+  myTravels: Array<Travel>;
   users?: Maybe<Array<User>>;
 };
 
 export type User = {
   __typename?: "User";
-  id: Scalars["String"];
+  uuid: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
+  email: Scalars["String"];
+  travels: Array<Travel>;
+};
+
+export type Travel = {
+  __typename?: "Travel";
+  entity: ReactionableEntity;
+  name: Scalars["String"];
+  description: Scalars["String"];
+  destinations: Array<Destination>;
+  albums: Array<Album>;
+  user: User;
+};
+
+export type ReactionableEntity = {
+  __typename?: "ReactionableEntity";
+  uuid: Scalars["String"];
+  likes: Array<Like>;
+  comments: Array<Comment>;
+  likesCount: Scalars["Int"];
+  commentCount: Scalars["Int"];
+};
+
+export type Like = {
+  __typename?: "Like";
+  entity_uuid: ReactionableEntity;
+  user: User;
+};
+
+export type Comment = {
+  __typename?: "Comment";
+  entity_uuid: ReactionableEntity;
+  uuid: Scalars["String"];
+  user: User;
+  content: Scalars["String"];
+};
+
+export type Destination = {
+  __typename?: "Destination";
+  entity: ReactionableEntity;
+  name: Scalars["String"];
+  arrivalDate: Scalars["DateTime"];
+  departureDate: Scalars["DateTime"];
+  illustrations: Array<Photo>;
+};
+
+export type Photo = {
+  __typename?: "Photo";
+  entity: ReactionableEntity;
+  url: Scalars["String"];
+};
+
+export type Album = {
+  __typename?: "Album";
+  entity: ReactionableEntity;
+  public: Scalars["Boolean"];
+  photos: Array<Photo>;
+  albumInvitations: Array<AlbumInvitation>;
+};
+
+export type AlbumInvitation = {
+  __typename?: "AlbumInvitation";
   email: Scalars["String"];
 };
 
@@ -96,7 +161,7 @@ export type RegisterMutation = { __typename?: "Mutation" } & {
 
 export type UserFieldsFragment = { __typename?: "User" } & Pick<
   User,
-  "id" | "firstName" | "lastName" | "email"
+  "uuid" | "firstName" | "lastName" | "email"
 >;
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
@@ -116,9 +181,17 @@ export type ValidateEmailMutation = { __typename?: "Mutation" } & {
   >;
 };
 
+export type MyTravelsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type MyTravelsQuery = { __typename?: "Query" } & {
+  myTravels: Array<
+    { __typename?: "Travel" } & Pick<Travel, "name" | "description">
+  >;
+};
+
 export const UserFieldsFragmentDoc = gql`
   fragment userFields on User {
-    id
+    uuid
     firstName
     lastName
     email
@@ -365,4 +438,55 @@ export type ValidateEmailMutationResult = Apollo.MutationResult<ValidateEmailMut
 export type ValidateEmailMutationOptions = Apollo.BaseMutationOptions<
   ValidateEmailMutation,
   ValidateEmailMutationVariables
+>;
+export const MyTravelsDocument = gql`
+  query myTravels {
+    myTravels {
+      name
+      description
+    }
+  }
+`;
+
+/**
+ * __useMyTravelsQuery__
+ *
+ * To run a query within a React component, call `useMyTravelsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyTravelsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMyTravelsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMyTravelsQuery(
+  baseOptions?: Apollo.QueryHookOptions<MyTravelsQuery, MyTravelsQueryVariables>
+) {
+  return Apollo.useQuery<MyTravelsQuery, MyTravelsQueryVariables>(
+    MyTravelsDocument,
+    baseOptions
+  );
+}
+export function useMyTravelsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    MyTravelsQuery,
+    MyTravelsQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<MyTravelsQuery, MyTravelsQueryVariables>(
+    MyTravelsDocument,
+    baseOptions
+  );
+}
+export type MyTravelsQueryHookResult = ReturnType<typeof useMyTravelsQuery>;
+export type MyTravelsLazyQueryHookResult = ReturnType<
+  typeof useMyTravelsLazyQuery
+>;
+export type MyTravelsQueryResult = Apollo.QueryResult<
+  MyTravelsQuery,
+  MyTravelsQueryVariables
 >;

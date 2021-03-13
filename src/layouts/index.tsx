@@ -6,7 +6,7 @@ export const Layout: FC = ({ children }) => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
-      <div className="flex-1 py-4">{children}</div>
+      <main className="flex-1 relative">{children}</main>
       <Footer />
     </div>
   );

@@ -33,9 +33,17 @@ export const server = async () => {
       server.use(bodyParser());
       server.use(sessionMiddleware(server));
 
+      server.use(async (ctx, next) => {
+        ctx.req.session = ctx.session;
+        return next();
+      });
+
       const schema = await buildSchema({
         resolvers,
         container: Container,
+        authChecker: ({ context }) => {
+          return context.session.user ? true : false;
+        },
       });
 
       const apollo = new ApolloServer({

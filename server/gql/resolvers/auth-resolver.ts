@@ -71,8 +71,8 @@ export class AuthResolver {
   async validateEmail(@Arg("key") key: String): Promise<SucessObject> {
     const buff = Buffer.from(key, "base64");
     const fullString = buff.toString("ascii");
-    const [id, email] = fullString.split(BASE64_SEPARATOR);
-    const user = await this.userRepository.findOne({ where: { id, email } });
+    const [uuid, email] = fullString.split(BASE64_SEPARATOR);
+    const user = await this.userRepository.findOne({ where: { uuid, email } });
     if (!user) throw new Error("This key in not valid");
     if (user.isActivated) return { success: true };
     user.isActivated = true;

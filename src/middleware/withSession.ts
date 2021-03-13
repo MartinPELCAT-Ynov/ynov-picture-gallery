@@ -3,8 +3,6 @@ import { ParsedUrlQuery } from "node:querystring";
 import { KoaCustomReq } from "server/types/koa-types";
 import { User } from "../../server/gql/entity/User";
 
-export type ServerSideConnectedProps = { user: User | undefined };
-
 export const getConnectedUser = (
   context: GetServerSidePropsContext
 ): User | null => {
@@ -17,14 +15,15 @@ export const withSession = <
   P extends { [key: string]: unknown } = { [key: string]: unknown },
   Q extends ParsedUrlQuery = ParsedUrlQuery
 >(
-  cb: (
+  cb?: (
     context: GetServerSidePropsContext<Q>,
     user: User
-  ) => Promise<GetServerSidePropsResult<P & ServerSideConnectedProps>>
+  ) => Promise<GetServerSidePropsResult<P>>
 ) => {
   return async (context: GetServerSidePropsContext<Q>) => {
     const user = getConnectedUser(context);
     if (!user) return redirectPath();
+    if (!cb) return { props: {} };
     return cb(context, user);
   };
 };
@@ -34,7 +33,7 @@ const redirectPath = (): {
 } => {
   return {
     redirect: {
-      destination: "/mcms-admin/login",
+      destination: "/auth/login",
       permanent: false,
     },
   };

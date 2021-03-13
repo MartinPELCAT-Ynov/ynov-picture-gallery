@@ -17,11 +17,24 @@ services:
     ports:
       - 6380:6379
 
-  fake-smtp:
-    image: ghusta/fakesmtp:2.0
-    container_name: fake-smtp
+  # fake-smtp:
+  #   image: ghusta/fakesmtp:2.0
+  #   container_name: fake-smtp
+  #   ports:
+  #     - "25:25"
+  #   volumes:
+  #     - ~/tmp/fakemail:/var/mail
+
+  mail:
+    container_name: sys_mail
+    restart: unless-stopped
+    image: eaudeweb/mailtrap
     ports:
-      - "25:25"
-    volumes:
-      - ~/tmp/fakemail:/var/mail
+      - "127.0.0.1:8125:80"
+      - "127.0.0.1:25:25"
+    environment:
+      - MT_USER=mailtrap
+      - MT_PASSWD=mailtrap
+      - MT_MAILBOX_LIMIT=512000001
+      - MT_MESSAGE_LIMIT=102400001
 # Mail trap

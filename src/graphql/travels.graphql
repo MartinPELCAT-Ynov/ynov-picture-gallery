@@ -1,0 +1,6 @@
+query myTravels {
+  myTravels {
+    name
+    description
+  }
+}

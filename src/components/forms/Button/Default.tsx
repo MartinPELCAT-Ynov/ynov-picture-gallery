@@ -6,9 +6,11 @@ export const DefaultButton = ({
   type = "submit",
   label,
   loading = false,
+  ...props
 }: ButtonProps) => {
   return (
     <button
+      {...props}
       type={type}
       className="relative bg-gray-700 text-white p-2 w-full text-center rounded-md flex items-center justify-center"
     >

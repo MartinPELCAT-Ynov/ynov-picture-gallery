@@ -29,7 +29,7 @@ mutation Register(
 }
 
 fragment userFields on User {
-  id
+  uuid
   firstName
   lastName
   email

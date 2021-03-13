@@ -12,10 +12,12 @@ import { SessionContext, SessionUser } from "src/contexts/session-context";
 import { Logo } from "../logo";
 import { useClickAway } from "react-use";
 import { useLogoutMutation } from "src/__generated__";
+import { CompassIcon } from "../icons/CompassIcon";
+import { useRouter } from "next/router";
 
 export const Header = () => {
   return (
-    <div className="flex shadow-md bg-white text-gray-800 justify-between items-center px-3">
+    <header className="flex shadow-md bg-white text-gray-800 justify-between items-center px-3">
       <Link href="/">
         <a className="py-3">
           <div className="flex space-x-2 items-center">
@@ -26,8 +28,15 @@ export const Header = () => {
           </div>
         </a>
       </Link>
+      <Link href="/explore">
+        <a>
+          <div className="hover:bg-gray-100 py-3 px-7 rounded-md">
+            <CompassIcon />
+          </div>
+        </a>
+      </Link>
       <ConnectionStatus />
-    </div>
+    </header>
   );
 };
 
@@ -56,7 +65,7 @@ const ConnectedStatus = ({ firstName, lastName }: SessionUser) => {
       <div
         className={clsx(
           !open && "hidden",
-          "bg-white p-1 shadow-md absolute top-14 right-0 border rounded-md w-60 space-y-1"
+          "bg-white p-1 shadow-md absolute top-14 right-0 border rounded-md w-60 space-y-1 z-40"
         )}
       >
         <DropDown />
@@ -67,12 +76,12 @@ const ConnectedStatus = ({ firstName, lastName }: SessionUser) => {
 
 const DropDown = () => {
   const [logout] = useLogoutMutation();
-  const { setUser } = useContext(SessionContext);
+  const { reload } = useRouter();
 
   const handleLogOut = async () => {
     try {
       await logout();
-      setUser(undefined);
+      reload();
     } catch (error) {}
   };
   return (

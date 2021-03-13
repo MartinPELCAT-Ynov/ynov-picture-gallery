@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { FormEvent, useContext } from "react";
+import { FormEvent, useContext, useEffect } from "react";
 import { Button } from "src/components/forms/Button";
 import { Form } from "src/components/forms/Form";
 import { FormRow } from "src/components/forms/form-row";
@@ -12,7 +12,7 @@ import { useLoginMutation } from "src/__generated__";
 type FormDatas = { email: string; password: string };
 
 export default function Login() {
-  const [login, { error, loading }] = useLoginMutation();
+  const [login, { data, error, loading }] = useLoginMutation();
   const { push, query } = useRouter();
 
   const { setUser } = useContext(SessionContext);
@@ -21,13 +21,18 @@ export default function Login() {
     try {
       e.preventDefault();
       const datas = generateFormDatas<FormDatas>(e.currentTarget);
-      const { data } = await login({ variables: datas });
-      setUser(data?.login);
-      push("/");
+      await login({ variables: datas });
     } catch (error) {
       //DO NOTHING
     }
   };
+
+  useEffect(() => {
+    if (data) {
+      setUser(data.login);
+      push("/");
+    }
+  }, [data]);
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-50">

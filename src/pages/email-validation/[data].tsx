@@ -29,11 +29,13 @@ export default function EmailValidation() {
   if (error) {
     return (
       <Layout>
-        <div className="w-2/3 mx-auto">
-          <div className="bg-white shadow-md rounded-md p-4">
-            <span className="text-3xl text-red-600">
-              Error: {error.message}
-            </span>
+        <div className="py-10">
+          <div className="w-2/3 mx-auto">
+            <div className="bg-white shadow-md rounded-md p-4">
+              <span className="text-3xl text-red-600">
+                Error: {error.message}
+              </span>
+            </div>
           </div>
         </div>
       </Layout>
@@ -42,12 +44,12 @@ export default function EmailValidation() {
 
   return (
     <Layout>
-      <div className="w-2/3 mx-auto">
-        <div className="bg-white shadow-md rounded-md p-4">
-          <div className="text-4xl text-gray-700 text-center font-light">
+      <div className="w-2/3 mx-auto py-10">
+        <div className="bg-white shadow-md rounded-md p-4 border-b-8 border-indigo-500">
+          <div className="text-6xl  leading-none text-gray-700 text-center font-extralight">
             Success !
           </div>
-          <div className=" flex justify-center mt-10">
+          <div className=" flex justify-center mt-8">
             <div className="text-xl">
               <div className="text-center">Your account is activated</div>
               <div className="text-center">Sign in to get started</div>
