@@ -1,7 +1,7 @@
 import { Field, ObjectType } from "type-graphql";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { Lazy } from "../helpers";
-import { ReactionableEntity } from "./LikeableEntity";
+import { ReactionableEntity } from "./ReactionableEntity";
 
 @ObjectType()
 @Entity()

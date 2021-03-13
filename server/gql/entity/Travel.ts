@@ -9,13 +9,13 @@ import {
   PrimaryColumn,
 } from "typeorm";
 import { Lazy } from "../helpers";
-import { ReactionableEntity } from "./LikeableEntity";
+import { ReactionableEntity } from "./ReactionableEntity";
 
 @ObjectType()
 @Entity()
 export class Travel {
   @PrimaryColumn("uuid")
-  @ManyToOne(() => ReactionableEntity, (lk) => lk.uuid, { lazy: true })
+  @ManyToOne(() => ReactionableEntity, { lazy: true })
   @JoinColumn({ name: "entity" })
   @Field(() => ReactionableEntity)
   entity!: Lazy<ReactionableEntity>;
@@ -24,8 +24,8 @@ export class Travel {
   @Field()
   name!: string;
 
-  @Column()
-  @Field()
+  @Column({ nullable: true })
+  @Field({ nullable: true })
   description!: string;
 
   @OneToMany(() => Destination, (destination) => destination.travel, {
@@ -38,7 +38,9 @@ export class Travel {
   @Field(() => [Album])
   albums!: Lazy<Album[]>;
 
-  @ManyToOne(() => User, (user) => user.travels, { lazy: true })
+  @ManyToOne(() => User, (user) => user.travels, {
+    lazy: true,
+  })
   @Field(() => User)
   user!: Lazy<User>;
 }

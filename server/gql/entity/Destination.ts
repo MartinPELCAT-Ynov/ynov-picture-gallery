@@ -10,7 +10,7 @@ import {
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
 import { Travel } from "./Travel";
-import { ReactionableEntity } from "./LikeableEntity";
+import { ReactionableEntity } from "./ReactionableEntity";
 import { Lazy } from "../helpers";
 
 @ObjectType()

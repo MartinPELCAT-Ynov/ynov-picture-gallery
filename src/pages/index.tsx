@@ -4,7 +4,7 @@ import { FetchTravels } from "src/components/travels/fetch-travels";
 import { useModal } from "src/hooks/useModal";
 import { Layout } from "src/layouts";
 import { withSession } from "src/middleware/withSession";
-import { CreateTravelModal } from "src/modals/create-travel";
+import { CreateTravelModal } from "src/modals/create-travel-modal";
 
 export default function Home() {
   const { show } = useModal(<CreateTravelModal />);

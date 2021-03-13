@@ -11,7 +11,7 @@ import {
 } from "typeorm";
 import { Photo, AlbumInvitation } from ".";
 import { Lazy } from "../helpers";
-import { ReactionableEntity } from "./LikeableEntity";
+import { ReactionableEntity } from "./ReactionableEntity";
 import { Travel } from "./Travel";
 
 @ObjectType()

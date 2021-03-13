@@ -54,7 +54,7 @@ export const server = async () => {
           },
         },
         context: async ({ ctx }) => ctx,
-        formatError: (error) => ({ message: error.message }),
+        // formatError: (error) => ({ message: error.message }),
       });
 
       // Add all routes
