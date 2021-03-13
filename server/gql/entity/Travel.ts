@@ -1,4 +1,4 @@
-import { Destination, Album, User } from ".";
+import { Destination, Album, User, AbstractEntity } from ".";
 import { Field, ObjectType } from "type-graphql";
 import {
   Column,
@@ -6,19 +6,19 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  PrimaryColumn,
+  OneToOne,
+  RelationId,
 } from "typeorm";
-import { Lazy } from "../helpers";
-import { ReactionableEntity } from "./ReactionableEntity";
 
 @ObjectType()
 @Entity()
 export class Travel {
-  @PrimaryColumn("uuid")
-  @ManyToOne(() => ReactionableEntity, { lazy: true })
+  @OneToOne(() => AbstractEntity, { primary: true, cascade: true })
   @JoinColumn({ name: "entity" })
-  @Field(() => ReactionableEntity)
-  entity!: Lazy<ReactionableEntity>;
+  entity!: AbstractEntity;
+
+  @RelationId((travel: Travel) => travel.entity)
+  entityId!: string;
 
   @Column()
   @Field()
@@ -28,19 +28,17 @@ export class Travel {
   @Field({ nullable: true })
   description!: string;
 
-  @OneToMany(() => Destination, (destination) => destination.travel, {
-    lazy: true,
-  })
+  @OneToMany(() => Destination, (destination) => destination.travel)
   @Field(() => [Destination])
-  destinations!: Lazy<Destination[]>;
+  destinations!: Destination[];
 
-  @OneToMany(() => Album, (album) => album.travel, { lazy: true })
+  @OneToMany(() => Album, (album) => album.travel)
   @Field(() => [Album])
-  albums!: Lazy<Album[]>;
+  albums!: Album[];
 
-  @ManyToOne(() => User, (user) => user.travels, {
-    lazy: true,
+  @ManyToOne(() => User, {
+    nullable: false,
   })
   @Field(() => User)
-  user!: Lazy<User>;
+  user!: User;
 }

@@ -1,10 +1,19 @@
 import { KoaContext } from "server/types/koa-types";
-import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Authorized,
+  Ctx,
+  FieldResolver,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+  Root,
+} from "type-graphql";
 import { Service } from "typedi";
 import { Repository } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { Travel, User } from "../entity";
-import { ReactionableEntity } from "../entity/ReactionableEntity";
+import { AbstractEntity, Travel, User } from "../entity";
 import { CreateTravelInput } from "../inputs/travel-input";
 
 @Resolver(() => Travel)
@@ -12,9 +21,7 @@ import { CreateTravelInput } from "../inputs/travel-input";
 export class TravelResolver {
   constructor(
     @InjectRepository(Travel)
-    private readonly travelRepository: Repository<Travel>,
-    @InjectRepository(ReactionableEntity)
-    private readonly entityRepository: Repository<ReactionableEntity>
+    private readonly travelRepository: Repository<Travel>
   ) {}
 
   @Query(() => [Travel])
@@ -31,14 +38,19 @@ export class TravelResolver {
     @Ctx() { session }: KoaContext
   ) {
     const user: User = session!.user;
-    const newEntity = this.entityRepository.create();
-    const entity = await this.entityRepository.save(newEntity);
     const travel = this.travelRepository.create({
       name,
       description,
-      entity: entity.uuid as any,
       user: user,
+      entity: AbstractEntity.create(),
     });
     return await this.travelRepository.save(travel);
+  }
+
+  @FieldResolver(() => Int)
+  async likeCounts(@Root() root: Travel) {
+    console.log(">>", root);
+
+    return 9;
   }
 }

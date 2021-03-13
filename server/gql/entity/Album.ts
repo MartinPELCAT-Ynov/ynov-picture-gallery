@@ -2,42 +2,33 @@ import { Field, ObjectType } from "type-graphql";
 import {
   Column,
   Entity,
-  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from "typeorm";
-import { Photo, AlbumInvitation } from ".";
-import { Lazy } from "../helpers";
-import { ReactionableEntity } from "./ReactionableEntity";
-import { Travel } from "./Travel";
+import { Photo, AlbumInvitation, Travel } from ".";
 
 @ObjectType()
 @Entity()
 export class Album {
-  @PrimaryColumn("uuid")
-  @ManyToOne(() => ReactionableEntity, (lk) => lk.uuid, { lazy: true })
-  @JoinColumn({ name: "entity" })
-  @Field(() => ReactionableEntity)
-  entity!: Lazy<ReactionableEntity>;
+  @PrimaryGeneratedColumn("uuid")
+  uuid!: string;
 
   @Column("boolean")
   @Field()
   public!: boolean;
 
-  @ManyToMany(() => Photo, { lazy: true })
+  @ManyToMany(() => Photo)
   @JoinTable()
   @Field(() => [Photo])
-  photos!: Lazy<Photo[]>;
+  photos!: Photo[];
 
-  @OneToMany(() => AlbumInvitation, (albumInvite) => albumInvite.album, {
-    lazy: true,
-  })
+  @OneToMany(() => AlbumInvitation, (albumInvite) => albumInvite.album)
   @Field(() => [AlbumInvitation])
   albumInvitations!: AlbumInvitation[];
 
-  @ManyToOne(() => Travel, (trvl) => trvl.albums, { lazy: true })
-  travel!: Lazy<Travel>;
+  @ManyToOne(() => Travel, (trvl) => trvl.albums)
+  travel!: Travel;
 }
