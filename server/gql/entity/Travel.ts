@@ -1,4 +1,4 @@
-import { Destination, Album, User, AbstractEntity } from ".";
+import { Destination, User, AbstractEntity } from ".";
 import { Field, ObjectType } from "type-graphql";
 import {
   Column,
@@ -14,10 +14,11 @@ import {
 @Entity()
 export class Travel {
   @OneToOne(() => AbstractEntity, { primary: true, cascade: true })
-  @JoinColumn({ name: "entity" })
+  @JoinColumn()
   entity!: AbstractEntity;
 
   @RelationId((travel: Travel) => travel.entity)
+  @Field()
   entityId!: string;
 
   @Column()
@@ -29,16 +30,10 @@ export class Travel {
   description!: string;
 
   @OneToMany(() => Destination, (destination) => destination.travel)
-  @Field(() => [Destination])
   destinations!: Destination[];
-
-  @OneToMany(() => Album, (album) => album.travel)
-  @Field(() => [Album])
-  albums!: Album[];
 
   @ManyToOne(() => User, {
     nullable: false,
   })
-  @Field(() => User)
   user!: User;
 }

@@ -13,7 +13,7 @@ import {
 import { Service } from "typedi";
 import { Repository } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { AbstractEntity, Travel, User } from "../entity";
+import { AbstractEntity, Album, Travel, User } from "../entity";
 import { CreateTravelInput } from "../inputs/travel-input";
 
 @Resolver(() => Travel)
@@ -21,7 +21,9 @@ import { CreateTravelInput } from "../inputs/travel-input";
 export class TravelResolver {
   constructor(
     @InjectRepository(Travel)
-    private readonly travelRepository: Repository<Travel>
+    private readonly travelRepository: Repository<Travel>,
+    @InjectRepository(Album)
+    private readonly albumRepository: Repository<Album>
   ) {}
 
   @Query(() => [Travel])
@@ -49,8 +51,14 @@ export class TravelResolver {
 
   @FieldResolver(() => Int)
   async likeCounts(@Root() root: Travel) {
-    console.log(">>", root);
-
+    console.log(">>", root.entityId);
     return 9;
+  }
+
+  @FieldResolver(() => [Album])
+  async albums(@Root() root: Travel) {
+    return await this.albumRepository.find({
+      where: { travel: root.entityId },
+    });
   }
 }

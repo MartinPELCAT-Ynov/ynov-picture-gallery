@@ -2,33 +2,26 @@ import { Field, ObjectType } from "type-graphql";
 import {
   Column,
   Entity,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
+  RelationId,
 } from "typeorm";
-import { Photo, AlbumInvitation, Travel } from ".";
+import { AbstractEntity } from ".";
 
 @ObjectType()
 @Entity()
 export class Album {
   @PrimaryGeneratedColumn("uuid")
+  @Field()
   uuid!: string;
 
   @Column("boolean")
   @Field()
-  public!: boolean;
+  isPublic!: boolean;
 
-  @ManyToMany(() => Photo)
-  @JoinTable()
-  @Field(() => [Photo])
-  photos!: Photo[];
+  @ManyToOne(() => AbstractEntity, { nullable: false })
+  travel!: AbstractEntity;
 
-  @OneToMany(() => AlbumInvitation, (albumInvite) => albumInvite.album)
-  @Field(() => [AlbumInvitation])
-  albumInvitations!: AlbumInvitation[];
-
-  @ManyToOne(() => Travel, (trvl) => trvl.albums)
-  travel!: Travel;
+  @RelationId((album: Album) => album.travel)
+  travelId!: string;
 }

@@ -3,6 +3,7 @@ import { KoaContext } from "server/types/koa-types";
 import { isValidPassword, hashPassword } from "../../utils/password-utils";
 import {
   Arg,
+  Authorized,
   Ctx,
   ForbiddenError,
   Mutation,
@@ -62,6 +63,7 @@ export class AuthResolver {
   }
 
   @Query(() => User)
+  @Authorized()
   me(@Ctx() { session }: KoaContext) {
     if (!session?.user) throw new ForbiddenError();
     return this.userRepository.findOne(session.user.id);
