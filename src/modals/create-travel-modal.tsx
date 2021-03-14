@@ -30,7 +30,7 @@ export const CreateTravelModal = () => {
   return (
     <Form onSubmit={handleSubmit}>
       <FormRow className="border-b pb-4 justify-center">
-        <span className="text-3xl font-light">Create travel</span>
+        <span className="text-3xl font-light italic">Create travel</span>
       </FormRow>
       <FormRow>
         <Input.Default label="Name" name="name" required />

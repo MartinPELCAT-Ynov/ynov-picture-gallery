@@ -39,17 +39,24 @@ export class AlbumResolver {
     return this.albumRepository.save(album);
   }
 
-  @FieldResolver(() => Int)
-  async photoCount() {
-    return 90;
-  }
-
   @FieldResolver(() => [Photo])
   async photos(@Root() album: Album): Promise<Photo[]> {
     const curentAlbum = await this.albumRepository.findOne({
       where: { uuid: album.uuid },
       relations: ["photos"],
     });
+    if (!curentAlbum) throw new Error("Cannot find album: " + album.uuid);
+    return curentAlbum.photos;
+  }
+
+  @FieldResolver(() => Int)
+  async photoCount(@Root() album: Album) {
+    const curentAlbum = await this.albumRepository
+      .createQueryBuilder("album")
+      .loadRelationCountAndMap("album.photos", "album.photos")
+      .where("album.uuid = :uuid", { uuid: album.uuid })
+      .getOne();
+
     if (!curentAlbum) throw new Error("Cannot find album: " + album.uuid);
     return curentAlbum.photos;
   }

@@ -53,6 +53,13 @@ export type Album = {
   uuid: Scalars["String"];
   isPublic: Scalars["Boolean"];
   name: Scalars["String"];
+  photos: Array<Photo>;
+  photoCount: Scalars["Int"];
+};
+
+export type Photo = {
+  __typename?: "Photo";
+  url: Scalars["String"];
 };
 
 export type Mutation = {
@@ -123,7 +130,7 @@ export type CreateAlbumMutation = { __typename?: "Mutation" } & {
 
 export type PreviewAlbumFragment = { __typename?: "Album" } & Pick<
   Album,
-  "name" | "uuid" | "isPublic"
+  "name" | "uuid" | "isPublic" | "photoCount"
 >;
 
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
@@ -210,6 +217,7 @@ export const PreviewAlbumFragmentDoc = gql`
     name
     uuid
     isPublic
+    photoCount
   }
 `;
 export const UserFieldsFragmentDoc = gql`

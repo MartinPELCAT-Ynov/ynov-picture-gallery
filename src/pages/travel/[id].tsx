@@ -1,4 +1,5 @@
 import { GetServerSideProps } from "next";
+import Link from "next/link";
 import React from "react";
 import { AlbumView } from "src/components/albums/album-view";
 import { Button } from "src/components/forms/Button";
@@ -15,7 +16,6 @@ import { CreateAlbumModal } from "src/modals/create-album-modal";
 
 export default function Travel() {
   const { show, content } = useModal(<CreateAlbumModal />);
-
   return (
     <Layout>
       <TravelContextProvider>
@@ -26,7 +26,11 @@ export default function Travel() {
                 <div className="divide-y">
                   <div className="px-10 py-5 flex justify-between">
                     <span className="text-4xl font-light">
-                      Travel: {travel?.name}
+                      <Link href="/">
+                        <a className="underline">Travel</a>
+                      </Link>
+                      :{" "}
+                      <span className="italic font-medium">{travel?.name}</span>
                     </span>
                     <Button.Create label="Create album" onClick={show} />
                   </div>

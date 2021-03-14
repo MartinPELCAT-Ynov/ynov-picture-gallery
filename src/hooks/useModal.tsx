@@ -26,7 +26,7 @@ export const useModal = (element: JSX.Element) => {
           "fixed top-0 bottom-0 left-0 right-0 bg-white bg-opacity-10 flex justify-center items-center backdrop-blur"
         )}
       >
-        <div className="w-3/4 bg-white shadow-md p-4 rounded-md" ref={ref}>
+        <div className="w-3/4 bg-white shadow-md p-4 rounded-xl" ref={ref}>
           {element}
         </div>
       </div>
