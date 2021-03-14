@@ -4,7 +4,7 @@ import { Button } from "src/components/forms/Button";
 import { Form } from "src/components/forms/Form";
 import { FormRow } from "src/components/forms/form-row";
 import { Input } from "src/components/forms/Input";
-import { AlbumContext } from "src/contexts/album-context";
+import { AlbumsContext } from "src/contexts/albums-context";
 import { useModalContext } from "src/hooks/useModalContext";
 import { generateFormDatas } from "src/utils/form-utils";
 import { useCreateAlbumMutation } from "src/__generated__";
@@ -14,7 +14,7 @@ type FormDatas = { name: string };
 export const CreateAlbumModal = () => {
   const { hide } = useModalContext();
   const [create] = useCreateAlbumMutation();
-  const { addAlbum } = useContext(AlbumContext);
+  const { addAlbum } = useContext(AlbumsContext);
 
   const { query } = useRouter();
 

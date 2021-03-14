@@ -1,10 +1,10 @@
 import { GetServerSideProps } from "next";
-import Link from "next/link";
 import React from "react";
 import { AlbumView } from "src/components/albums/album-view";
 import { Button } from "src/components/forms/Button";
+import { PreviouIcon } from "src/components/icons/PreviouIcon";
 import { Modal } from "src/components/Modal";
-import { AlbumContextProvider } from "src/contexts/album-context";
+import { AlbumsContextProvider } from "src/contexts/albums-context";
 import {
   TravelContext,
   TravelContextProvider,
@@ -19,17 +19,14 @@ export default function Travel() {
   return (
     <Layout>
       <TravelContextProvider>
-        <AlbumContextProvider>
+        <AlbumsContextProvider>
           <TravelContext.Consumer>
             {({ travel }) => (
               <>
                 <div className="divide-y">
-                  <div className="px-10 py-5 flex justify-between">
-                    <span className="text-4xl font-light">
-                      <Link href="/">
-                        <a className="underline">Travel</a>
-                      </Link>
-                      :{" "}
+                  <div className="px-10 py-5 flex justify-between items-center">
+                    <span className="text-4xl font-light flex items-center space-x-4">
+                      <PreviouIcon />
                       <span className="italic font-medium">{travel?.name}</span>
                     </span>
                     <Button.Create label="Create album" onClick={show} />
@@ -40,7 +37,7 @@ export default function Travel() {
               </>
             )}
           </TravelContext.Consumer>
-        </AlbumContextProvider>
+        </AlbumsContextProvider>
       </TravelContextProvider>
     </Layout>
   );

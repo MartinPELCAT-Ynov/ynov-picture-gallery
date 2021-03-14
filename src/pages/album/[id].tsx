@@ -1,9 +1,9 @@
 import { GetServerSideProps } from "next";
-import Link from "next/link";
 import React from "react";
 import { Button } from "src/components/forms/Button";
+import { PreviouIcon } from "src/components/icons/PreviouIcon";
 import { Modal } from "src/components/Modal";
-import { AlbumContextProvider } from "src/contexts/album-context";
+import { AlbumsContextProvider } from "src/contexts/albums-context";
 import { TravelContextProvider } from "src/contexts/travel-context";
 import { useModal } from "src/hooks/useModal";
 import { Layout } from "src/layouts";
@@ -19,14 +19,12 @@ export default function Travel() {
   return (
     <Layout>
       <TravelContextProvider>
-        <AlbumContextProvider>
+        <AlbumsContextProvider>
           <div className="divide-y">
-            <div className="px-10 py-5 flex justify-between">
-              <span className="text-4xl font-light">
-                <Link href="/">
-                  <a className="underline">Album</a>
-                </Link>
-                : <span className="italic font-medium">{"[ALBUM NAME]"}</span>
+            <div className="px-10 py-5 flex justify-between items-center">
+              <span className="text-4xl font-light flex items-center space-x-4">
+                <PreviouIcon />
+                <span className="italic font-medium text-4xl">{`[ALBUM NAME]`}</span>
               </span>
               <div className="flex space-x-4">
                 <Button.Create label="Invite" onClick={showInvite} />
@@ -37,7 +35,7 @@ export default function Travel() {
           </div>
           <Modal content={content} />
           <Modal content={inviteContent} />
-        </AlbumContextProvider>
+        </AlbumsContextProvider>
       </TravelContextProvider>
     </Layout>
   );

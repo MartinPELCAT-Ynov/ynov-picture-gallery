@@ -16,7 +16,7 @@ export default function Home() {
       <TravelsContextProvider>
         <div className="divide-y">
           <div className="px-10 py-5 flex justify-between">
-            <span className="text-4xl font-light">Travels</span>
+            <span className="text-4xl font-light">All Travels</span>
             <Button.Create label="Create travel" onClick={show} />
           </div>
           <TravelsView />

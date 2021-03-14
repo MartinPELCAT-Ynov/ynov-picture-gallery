@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useContext, useEffect } from "react";
-import { AlbumContext } from "src/contexts/album-context";
+import { AlbumsContext } from "src/contexts/albums-context";
 import { TravelContext } from "src/contexts/travel-context";
 import { useGetTravelQuery } from "src/__generated__";
 import { GraphQLErrorFetch } from "../GraphQLErrorFetch";
@@ -14,7 +14,7 @@ export const AlbumView = () => {
   });
 
   const { setTravel } = useContext(TravelContext);
-  const { albums, setAlbums } = useContext(AlbumContext);
+  const { albums, setAlbums } = useContext(AlbumsContext);
 
   useEffect(() => {
     refetch();
