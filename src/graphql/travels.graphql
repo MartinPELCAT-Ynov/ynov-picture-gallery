@@ -1,6 +1,18 @@
 query myTravels {
   myTravels {
-    name
-    description
+    ...previewTravel
   }
+}
+
+mutation createTravel($name: String!, $description: String) {
+  createTravel(input: { name: $name, description: $description }) {
+    ...previewTravel
+  }
+}
+
+fragment previewTravel on Travel {
+  uuid
+  name
+  description
+  albumsCount
 }

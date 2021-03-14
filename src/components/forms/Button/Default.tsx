@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import React from "react";
 import { Spinner } from "src/components/spinner";
 import { ButtonProps } from ".";
@@ -12,7 +13,10 @@ export const DefaultButton = ({
     <button
       {...props}
       type={type}
-      className="relative bg-gray-700 text-white p-2 w-full text-center rounded-md flex items-center justify-center"
+      className={clsx(
+        props.className ? props.className : "bg-gray-700 text-white",
+        "relative p-2 w-full text-center rounded-md flex items-center justify-center"
+      )}
     >
       {loading && (
         <div className="absolute left-4">

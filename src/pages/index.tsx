@@ -1,23 +1,28 @@
 import { GetServerSideProps } from "next";
 import { Button } from "src/components/forms/Button";
-import { FetchTravels } from "src/components/travels/fetch-travels";
+import { Modal } from "src/components/Modal";
+import { TravelsView } from "src/components/travels/travels-view";
+import { TravelContextProvider } from "src/contexts/travels-context";
 import { useModal } from "src/hooks/useModal";
 import { Layout } from "src/layouts";
 import { withSession } from "src/middleware/withSession";
 import { CreateTravelModal } from "src/modals/create-travel-modal";
 
 export default function Home() {
-  const { show } = useModal(<CreateTravelModal />);
+  const { show, content } = useModal(<CreateTravelModal />);
 
   return (
     <Layout>
-      <div className="divide-y">
-        <div className="px-10 py-5 flex justify-between">
-          <span className="text-4xl font-light">Travels</span>
-          <Button.Create label="Create travel" onClick={show} />
+      <TravelContextProvider>
+        <div className="divide-y">
+          <div className="px-10 py-5 flex justify-between">
+            <span className="text-4xl font-light">Travels</span>
+            <Button.Create label="Create travel" onClick={show} />
+          </div>
+          <TravelsView />
         </div>
-        <FetchTravels />
-      </div>
+        <Modal content={content} />
+      </TravelContextProvider>
     </Layout>
   );
 }

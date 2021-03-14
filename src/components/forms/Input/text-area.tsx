@@ -1,27 +1,27 @@
-import { DetailedHTMLProps, InputHTMLAttributes } from "react";
+import { DetailedHTMLProps, TextareaHTMLAttributes } from "react";
 import { InputProps } from ".";
 
-type DefaultInputProps = InputProps &
-  DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
-
-export const DefaultInput = ({
+type TextAreaProps = InputProps &
+  DetailedHTMLProps<
+    TextareaHTMLAttributes<HTMLTextAreaElement>,
+    HTMLTextAreaElement
+  >;
+export const TextArea = ({
   label,
   name,
-  type = "text",
   placeholder = label,
   required = false,
   defaultValue,
   ...rest
-}: DefaultInputProps) => {
+}: TextAreaProps) => {
   return (
     <div className="flex flex-col flex-1">
       <label htmlFor={name}>
         {label}
         {required && <span className="text-red-600 pl-0.5">*</span>}
       </label>
-      <input
+      <textarea
         {...rest}
-        type={type}
         name={name}
         id={name}
         className="bg-gray-100 w-full px-1 py-2 rounded-md"

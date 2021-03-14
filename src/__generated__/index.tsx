@@ -15,8 +15,6 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
-  DateTime: any;
 };
 
 export type Query = {
@@ -37,71 +35,33 @@ export type User = {
 
 export type Travel = {
   __typename?: "Travel";
-  entity: ReactionableEntity;
+  uuid: Scalars["String"];
   name: Scalars["String"];
-  description: Scalars["String"];
-  destinations: Array<Destination>;
+  description?: Maybe<Scalars["String"]>;
+  likeCounts: Scalars["Int"];
   albums: Array<Album>;
-  user: User;
-};
-
-export type ReactionableEntity = {
-  __typename?: "ReactionableEntity";
-  uuid: Scalars["String"];
-  likes: Array<Like>;
-  comments: Array<Comment>;
-  likesCount: Scalars["Int"];
-  commentCount: Scalars["Int"];
-};
-
-export type Like = {
-  __typename?: "Like";
-  entity_uuid: ReactionableEntity;
-  user: User;
-};
-
-export type Comment = {
-  __typename?: "Comment";
-  entity_uuid: ReactionableEntity;
-  uuid: Scalars["String"];
-  user: User;
-  content: Scalars["String"];
-};
-
-export type Destination = {
-  __typename?: "Destination";
-  entity: ReactionableEntity;
-  name: Scalars["String"];
-  arrivalDate: Scalars["DateTime"];
-  departureDate: Scalars["DateTime"];
-  illustrations: Array<Photo>;
-};
-
-export type Photo = {
-  __typename?: "Photo";
-  entity: ReactionableEntity;
-  url: Scalars["String"];
+  albumsCount: Scalars["Int"];
 };
 
 export type Album = {
   __typename?: "Album";
-  entity: ReactionableEntity;
-  public: Scalars["Boolean"];
-  photos: Array<Photo>;
-  albumInvitations: Array<AlbumInvitation>;
-};
-
-export type AlbumInvitation = {
-  __typename?: "AlbumInvitation";
-  email: Scalars["String"];
+  uuid: Scalars["String"];
+  isPublic: Scalars["Boolean"];
+  name: Scalars["String"];
 };
 
 export type Mutation = {
   __typename?: "Mutation";
+  createAlbum: Album;
   login: User;
   register: SucessObject;
   logout: SucessObject;
   validateEmail: SucessObject;
+  createTravel?: Maybe<Travel>;
+};
+
+export type MutationCreateAlbumArgs = {
+  input: CreateAlbumInput;
 };
 
 export type MutationLoginArgs = {
@@ -114,6 +74,15 @@ export type MutationRegisterArgs = {
 
 export type MutationValidateEmailArgs = {
   key: Scalars["String"];
+};
+
+export type MutationCreateTravelArgs = {
+  input: CreateTravelInput;
+};
+
+export type CreateAlbumInput = {
+  travelId: Scalars["String"];
+  name: Scalars["String"];
 };
 
 export type LoginInput = {
@@ -131,6 +100,11 @@ export type RegisterInput = {
   lastName: Scalars["String"];
   email: Scalars["String"];
   password: Scalars["String"];
+};
+
+export type CreateTravelInput = {
+  name: Scalars["String"];
+  description?: Maybe<Scalars["String"]>;
 };
 
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
@@ -184,10 +158,22 @@ export type ValidateEmailMutation = { __typename?: "Mutation" } & {
 export type MyTravelsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MyTravelsQuery = { __typename?: "Query" } & {
-  myTravels: Array<
-    { __typename?: "Travel" } & Pick<Travel, "name" | "description">
-  >;
+  myTravels: Array<{ __typename?: "Travel" } & PreviewTravelFragment>;
 };
+
+export type CreateTravelMutationVariables = Exact<{
+  name: Scalars["String"];
+  description?: Maybe<Scalars["String"]>;
+}>;
+
+export type CreateTravelMutation = { __typename?: "Mutation" } & {
+  createTravel?: Maybe<{ __typename?: "Travel" } & PreviewTravelFragment>;
+};
+
+export type PreviewTravelFragment = { __typename?: "Travel" } & Pick<
+  Travel,
+  "uuid" | "name" | "description" | "albumsCount"
+>;
 
 export const UserFieldsFragmentDoc = gql`
   fragment userFields on User {
@@ -195,6 +181,14 @@ export const UserFieldsFragmentDoc = gql`
     firstName
     lastName
     email
+  }
+`;
+export const PreviewTravelFragmentDoc = gql`
+  fragment previewTravel on Travel {
+    uuid
+    name
+    description
+    albumsCount
   }
 `;
 export const MeDocument = gql`
@@ -442,10 +436,10 @@ export type ValidateEmailMutationOptions = Apollo.BaseMutationOptions<
 export const MyTravelsDocument = gql`
   query myTravels {
     myTravels {
-      name
-      description
+      ...previewTravel
     }
   }
+  ${PreviewTravelFragmentDoc}
 `;
 
 /**
@@ -489,4 +483,54 @@ export type MyTravelsLazyQueryHookResult = ReturnType<
 export type MyTravelsQueryResult = Apollo.QueryResult<
   MyTravelsQuery,
   MyTravelsQueryVariables
+>;
+export const CreateTravelDocument = gql`
+  mutation createTravel($name: String!, $description: String) {
+    createTravel(input: { name: $name, description: $description }) {
+      ...previewTravel
+    }
+  }
+  ${PreviewTravelFragmentDoc}
+`;
+export type CreateTravelMutationFn = Apollo.MutationFunction<
+  CreateTravelMutation,
+  CreateTravelMutationVariables
+>;
+
+/**
+ * __useCreateTravelMutation__
+ *
+ * To run a mutation, you first call `useCreateTravelMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTravelMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createTravelMutation, { data, loading, error }] = useCreateTravelMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      description: // value for 'description'
+ *   },
+ * });
+ */
+export function useCreateTravelMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateTravelMutation,
+    CreateTravelMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    CreateTravelMutation,
+    CreateTravelMutationVariables
+  >(CreateTravelDocument, baseOptions);
+}
+export type CreateTravelMutationHookResult = ReturnType<
+  typeof useCreateTravelMutation
+>;
+export type CreateTravelMutationResult = Apollo.MutationResult<CreateTravelMutation>;
+export type CreateTravelMutationOptions = Apollo.BaseMutationOptions<
+  CreateTravelMutation,
+  CreateTravelMutationVariables
 >;
