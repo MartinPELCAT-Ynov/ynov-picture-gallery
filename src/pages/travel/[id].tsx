@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next";
 import React from "react";
-import { AlbumView } from "src/components/albums/album-view";
+import { AlbumsView } from "src/components/albums/albums-view";
 import { Button } from "src/components/forms/Button";
 import { PreviouIcon } from "src/components/icons/PreviouIcon";
 import { Modal } from "src/components/Modal";
@@ -31,7 +31,7 @@ export default function Travel() {
                     </span>
                     <Button.Create label="Create album" onClick={show} />
                   </div>
-                  <AlbumView />
+                  <AlbumsView />
                 </div>
                 <Modal content={content} />
               </>

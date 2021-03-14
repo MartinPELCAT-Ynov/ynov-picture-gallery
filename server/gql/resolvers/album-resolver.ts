@@ -9,6 +9,8 @@ import {
   FieldResolver,
   Int,
   Root,
+  Query,
+  UnauthorizedError,
 } from "type-graphql";
 import { Service } from "typedi";
 import { Repository } from "typeorm";
@@ -39,6 +41,20 @@ export class AlbumResolver {
     return this.albumRepository.save(album);
   }
 
+  @Query(() => Album)
+  async album(@Arg("id") uuid: string, @Ctx() { session }: KoaContext) {
+    const album = await this.albumRepository.findOne({ where: { uuid } });
+    if (!album) throw new Error("Album does not exist");
+    const sessionUser = session?.user as User | null;
+    const user = await this.getAlbumOwner(album);
+    const isPublic = album.isPublic;
+    if (!isPublic && sessionUser?.uuid !== user.uuid) {
+      throw new UnauthorizedError();
+    } else {
+      return album;
+    }
+  }
+
   @FieldResolver(() => [Photo])
   async photos(@Root() album: Album): Promise<Photo[]> {
     const curentAlbum = await this.albumRepository.findOne({
@@ -59,5 +75,20 @@ export class AlbumResolver {
 
     if (!curentAlbum) throw new Error("Cannot find album: " + album.uuid);
     return curentAlbum.photos;
+  }
+
+  @FieldResolver(() => User, { nullable: true })
+  async owner(@Root() album: Album) {
+    const user = await this.getAlbumOwner(album);
+    return user;
+  }
+
+  private async getAlbumOwner(album: Album): Promise<User> {
+    const travel = await this.travelRepository.findOne({
+      where: { entity: album.travelId },
+      relations: ["user"],
+    });
+    if (!travel) throw new Error("Faild to fetch user");
+    return travel.user;
   }
 }

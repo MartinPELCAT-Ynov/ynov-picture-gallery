@@ -4,6 +4,22 @@ mutation createAlbum($travelId: String!, $name: String!) {
   }
 }
 
+query getAlbum($id: String!) {
+  album(id: $id) {
+    photoCount
+    uuid
+    name
+    photos {
+      url
+      uuid
+    }
+    owner {
+      firstName
+      lastName
+    }
+  }
+}
+
 fragment previewAlbum on Album {
   name
   uuid

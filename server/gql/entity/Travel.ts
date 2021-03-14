@@ -1,4 +1,4 @@
-import { Destination, User, AbstractEntity } from ".";
+import { Destination, User, AbstractEntity, Album } from ".";
 import { Field, ObjectType } from "type-graphql";
 import {
   Column,
@@ -31,6 +31,9 @@ export class Travel {
 
   @OneToMany(() => Destination, (destination) => destination.travel)
   destinations!: Destination[];
+
+  @OneToMany(() => Album, (album) => album.travel)
+  album!: Album;
 
   @ManyToOne(() => User, {
     nullable: false,

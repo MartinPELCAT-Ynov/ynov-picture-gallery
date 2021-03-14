@@ -19,14 +19,35 @@ export type Scalars = {
 
 export type Query = {
   __typename?: "Query";
+  album: Album;
   me: User;
   myTravels: Array<Travel>;
   getTravel: Travel;
   users?: Maybe<Array<User>>;
 };
 
+export type QueryAlbumArgs = {
+  id: Scalars["String"];
+};
+
 export type QueryGetTravelArgs = {
   id: Scalars["String"];
+};
+
+export type Album = {
+  __typename?: "Album";
+  uuid: Scalars["String"];
+  isPublic: Scalars["Boolean"];
+  name: Scalars["String"];
+  photos: Array<Photo>;
+  photoCount: Scalars["Int"];
+  owner?: Maybe<User>;
+};
+
+export type Photo = {
+  __typename?: "Photo";
+  uuid: Scalars["String"];
+  url: Scalars["String"];
 };
 
 export type User = {
@@ -46,20 +67,6 @@ export type Travel = {
   likeCounts: Scalars["Int"];
   albums: Array<Album>;
   albumsCount: Scalars["Int"];
-};
-
-export type Album = {
-  __typename?: "Album";
-  uuid: Scalars["String"];
-  isPublic: Scalars["Boolean"];
-  name: Scalars["String"];
-  photos: Array<Photo>;
-  photoCount: Scalars["Int"];
-};
-
-export type Photo = {
-  __typename?: "Photo";
-  url: Scalars["String"];
 };
 
 export type Mutation = {
@@ -126,6 +133,22 @@ export type CreateAlbumMutationVariables = Exact<{
 
 export type CreateAlbumMutation = { __typename?: "Mutation" } & {
   createAlbum: { __typename?: "Album" } & PreviewAlbumFragment;
+};
+
+export type GetAlbumQueryVariables = Exact<{
+  id: Scalars["String"];
+}>;
+
+export type GetAlbumQuery = { __typename?: "Query" } & {
+  album: { __typename?: "Album" } & Pick<
+    Album,
+    "photoCount" | "uuid" | "name"
+  > & {
+      photos: Array<{ __typename?: "Photo" } & Pick<Photo, "url" | "uuid">>;
+      owner?: Maybe<
+        { __typename?: "User" } & Pick<User, "firstName" | "lastName">
+      >;
+    };
 };
 
 export type PreviewAlbumFragment = { __typename?: "Album" } & Pick<
@@ -285,6 +308,67 @@ export type CreateAlbumMutationResult = Apollo.MutationResult<CreateAlbumMutatio
 export type CreateAlbumMutationOptions = Apollo.BaseMutationOptions<
   CreateAlbumMutation,
   CreateAlbumMutationVariables
+>;
+export const GetAlbumDocument = gql`
+  query getAlbum($id: String!) {
+    album(id: $id) {
+      photoCount
+      uuid
+      name
+      photos {
+        url
+        uuid
+      }
+      owner {
+        firstName
+        lastName
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetAlbumQuery__
+ *
+ * To run a query within a React component, call `useGetAlbumQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAlbumQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAlbumQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetAlbumQuery(
+  baseOptions: Apollo.QueryHookOptions<GetAlbumQuery, GetAlbumQueryVariables>
+) {
+  return Apollo.useQuery<GetAlbumQuery, GetAlbumQueryVariables>(
+    GetAlbumDocument,
+    baseOptions
+  );
+}
+export function useGetAlbumLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAlbumQuery,
+    GetAlbumQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<GetAlbumQuery, GetAlbumQueryVariables>(
+    GetAlbumDocument,
+    baseOptions
+  );
+}
+export type GetAlbumQueryHookResult = ReturnType<typeof useGetAlbumQuery>;
+export type GetAlbumLazyQueryHookResult = ReturnType<
+  typeof useGetAlbumLazyQuery
+>;
+export type GetAlbumQueryResult = Apollo.QueryResult<
+  GetAlbumQuery,
+  GetAlbumQueryVariables
 >;
 export const MeDocument = gql`
   query Me {

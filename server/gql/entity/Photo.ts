@@ -5,6 +5,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class Photo {
   @PrimaryGeneratedColumn("uuid")
+  @Field()
   uuid!: string;
 
   @Column()

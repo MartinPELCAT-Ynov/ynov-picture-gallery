@@ -7,7 +7,7 @@ import { GraphQLErrorFetch } from "../GraphQLErrorFetch";
 import { ListSkeleton } from "../skeletons/list-skelton";
 import { AlbumList } from "./album-list";
 
-export const AlbumView = () => {
+export const AlbumsView = () => {
   const { query } = useRouter();
   const { data, loading, error, refetch } = useGetTravelQuery({
     variables: { id: query.id as string },
