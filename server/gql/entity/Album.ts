@@ -15,9 +15,13 @@ export class Album {
   @Field()
   uuid!: string;
 
-  @Column("boolean")
+  @Column("boolean", { default: false })
   @Field()
   isPublic!: boolean;
+
+  @Column()
+  @Field()
+  name!: string;
 
   @ManyToOne(() => AbstractEntity, { nullable: false })
   travel!: AbstractEntity;

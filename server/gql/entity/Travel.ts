@@ -19,7 +19,7 @@ export class Travel {
 
   @RelationId((travel: Travel) => travel.entity)
   @Field()
-  entityId!: string;
+  uuid!: string;
 
   @Column()
   @Field()
@@ -36,4 +36,7 @@ export class Travel {
     nullable: false,
   })
   user!: User;
+
+  @RelationId((travel: Travel) => travel.user)
+  userId!: string;
 }

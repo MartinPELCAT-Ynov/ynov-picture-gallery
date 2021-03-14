@@ -50,15 +50,31 @@ export class TravelResolver {
   }
 
   @FieldResolver(() => Int)
-  async likeCounts(@Root() root: Travel) {
-    console.log(">>", root.entityId);
+  async likeCounts() {
     return 9;
   }
 
   @FieldResolver(() => [Album])
-  async albums(@Root() root: Travel) {
-    return await this.albumRepository.find({
-      where: { travel: root.entityId },
-    });
+  async albums(@Root() travel: Travel, @Ctx() { session }: KoaContext) {
+    const sessionUser = session?.user as User | null;
+    return !sessionUser || sessionUser.uuid !== travel.userId
+      ? this.albumRepository.find({
+          where: { travel, isPublic: true },
+        })
+      : this.albumRepository.find({
+          where: { travel },
+        });
+  }
+
+  @FieldResolver(() => Int)
+  async albumsCount(@Root() travel: Travel, @Ctx() { session }: KoaContext) {
+    const sessionUser = session?.user as User | null;
+    return !sessionUser || sessionUser.uuid !== travel.userId
+      ? this.albumRepository.count({
+          where: { travel, isPublic: true },
+        })
+      : this.albumRepository.count({
+          where: { travel },
+        });
   }
 }
