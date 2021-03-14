@@ -1,12 +1,45 @@
+import { GetServerSideProps } from "next";
+import React from "react";
+import { AlbumView } from "src/components/albums/album-view";
+import { Button } from "src/components/forms/Button";
+import { Modal } from "src/components/Modal";
+import { AlbumContextProvider } from "src/contexts/album-context";
+import {
+  TravelContext,
+  TravelContextProvider,
+} from "src/contexts/travel-context";
+import { useModal } from "src/hooks/useModal";
 import { Layout } from "src/layouts";
+import { withSession } from "src/middleware/withSession";
+import { CreateAlbumModal } from "src/modals/create-album-modal";
 
 export default function Travel() {
+  const { show, content } = useModal(<CreateAlbumModal />);
+
   return (
     <Layout>
-      <div className="fixed md:absolute top-0 left-0 bottom-0 right-0 flex flex-col lg:flex-row">
-        <div className="bg-indigo-300  lg:w-4/6 ">te</div>
-        <div className="bg-indigo-600  lg:flex-1">te</div>
-      </div>
+      <TravelContextProvider>
+        <AlbumContextProvider>
+          <TravelContext.Consumer>
+            {({ travel }) => (
+              <>
+                <div className="divide-y">
+                  <div className="px-10 py-5 flex justify-between">
+                    <span className="text-4xl font-light">
+                      Travel: {travel?.name}
+                    </span>
+                    <Button.Create label="Create album" onClick={show} />
+                  </div>
+                  <AlbumView />
+                </div>
+                <Modal content={content} />
+              </>
+            )}
+          </TravelContext.Consumer>
+        </AlbumContextProvider>
+      </TravelContextProvider>
     </Layout>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = withSession();

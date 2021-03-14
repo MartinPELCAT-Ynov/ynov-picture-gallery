@@ -2,16 +2,19 @@ import { Field, ObjectType } from "type-graphql";
 import {
   Column,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   RelationId,
 } from "typeorm";
 import { AbstractEntity } from ".";
+import { Photo } from "./Photo";
 
 @ObjectType()
 @Entity()
 export class Album {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn("uuid", { name: "uuid" })
   @Field()
   uuid!: string;
 
@@ -22,6 +25,10 @@ export class Album {
   @Column()
   @Field()
   name!: string;
+
+  @ManyToMany(() => Photo)
+  @JoinTable()
+  photos!: Photo[];
 
   @ManyToOne(() => AbstractEntity, { nullable: false })
   travel!: AbstractEntity;

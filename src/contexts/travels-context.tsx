@@ -1,16 +1,16 @@
 import { createContext, Dispatch, FC, SetStateAction, useState } from "react";
 import { PreviewTravelFragment } from "src/__generated__";
 
-type TravelContextType = {
+type TravelsContextType = {
   addTravel: (travel: PreviewTravelFragment) => void;
   removeTravel: (travelId: string) => void;
   travels: PreviewTravelFragment[];
   setTravels: Dispatch<SetStateAction<PreviewTravelFragment[]>>;
 };
 
-export const TravelContext = createContext<TravelContextType>(undefined!);
+export const TravelsContext = createContext<TravelsContextType>(undefined!);
 
-export const TravelContextProvider: FC = ({ children }) => {
+export const TravelsContextProvider: FC = ({ children }) => {
   const [travels, setTravels] = useState<PreviewTravelFragment[]>([]);
 
   const addTravel = (travel: PreviewTravelFragment) => {
@@ -21,10 +21,10 @@ export const TravelContextProvider: FC = ({ children }) => {
   };
 
   return (
-    <TravelContext.Provider
+    <TravelsContext.Provider
       value={{ addTravel, removeTravel, travels, setTravels }}
     >
       {children}
-    </TravelContext.Provider>
+    </TravelsContext.Provider>
   );
 };

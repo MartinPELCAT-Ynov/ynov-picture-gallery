@@ -49,6 +49,11 @@ export class TravelResolver {
     return await this.travelRepository.save(travel);
   }
 
+  @Query(() => Travel)
+  async getTravel(@Arg("id") id: string) {
+    return this.travelRepository.findOne(id);
+  }
+
   @FieldResolver(() => Int)
   async likeCounts() {
     return 9;

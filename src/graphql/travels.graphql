@@ -16,3 +16,14 @@ fragment previewTravel on Travel {
   description
   albumsCount
 }
+
+query getTravel($id: String!) {
+  getTravel(id: $id) {
+    uuid
+    name
+    description
+    albums {
+      ...previewAlbum
+    }
+  }
+}

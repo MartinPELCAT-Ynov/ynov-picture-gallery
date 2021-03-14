@@ -1,14 +1,14 @@
 import { useContext, useEffect } from "react";
-import { TravelContext } from "src/contexts/travels-context";
+import { TravelsContext } from "src/contexts/travels-context";
 import { useMyTravelsQuery } from "src/__generated__";
 import { GraphQLErrorFetch } from "../GraphQLErrorFetch";
-import { ListSkeleton } from "./list-skelton";
+import { ListSkeleton } from "../skeletons/list-skelton";
 import { TravelList } from "./travel-list";
 
 export const TravelsView = () => {
   const { data, loading, error, refetch } = useMyTravelsQuery();
 
-  const { travels, setTravels } = useContext(TravelContext);
+  const { travels, setTravels } = useContext(TravelsContext);
 
   useEffect(() => {
     refetch();

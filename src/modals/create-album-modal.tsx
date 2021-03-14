@@ -1,26 +1,31 @@
+import { useRouter } from "next/router";
 import { FormEvent, useContext } from "react";
 import { Button } from "src/components/forms/Button";
 import { Form } from "src/components/forms/Form";
 import { FormRow } from "src/components/forms/form-row";
 import { Input } from "src/components/forms/Input";
-import { TravelsContext } from "src/contexts/travels-context";
+import { AlbumContext } from "src/contexts/album-context";
 import { useModalContext } from "src/hooks/useModalContext";
 import { generateFormDatas } from "src/utils/form-utils";
-import { useCreateTravelMutation } from "src/__generated__/index";
+import { useCreateAlbumMutation } from "src/__generated__";
 
-type FormDatas = { name: string; description: string };
+type FormDatas = { name: string };
 
-export const CreateTravelModal = () => {
+export const CreateAlbumModal = () => {
   const { hide } = useModalContext();
-  const [create] = useCreateTravelMutation();
-  const { addTravel } = useContext(TravelsContext);
+  const [create] = useCreateAlbumMutation();
+  const { addAlbum } = useContext(AlbumContext);
+
+  const { query } = useRouter();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
       const datas = generateFormDatas<FormDatas>(e.currentTarget);
-      const { data } = await create({ variables: datas });
-      addTravel(data!.createTravel!);
+      const { data } = await create({
+        variables: { ...datas, travelId: query.id as string },
+      });
+      addAlbum(data?.createAlbum!);
       hide();
     } catch (error) {
       // DO NOTHING
@@ -34,9 +39,6 @@ export const CreateTravelModal = () => {
       </FormRow>
       <FormRow>
         <Input.Default label="Name" name="name" required />
-      </FormRow>
-      <FormRow>
-        <Input.TextArea label="Description" name="description" rows={5} />
       </FormRow>
       <FormRow className="justify-end">
         <div className="w-1/2 flex space-x-4">

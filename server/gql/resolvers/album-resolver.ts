@@ -6,11 +6,14 @@ import {
   Mutation,
   Resolver,
   ForbiddenError,
+  FieldResolver,
+  Int,
+  Root,
 } from "type-graphql";
 import { Service } from "typedi";
 import { Repository } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { Album, Travel, User } from "../entity";
+import { Album, Photo, Travel, User } from "../entity";
 import { CreateAlbumInput } from "../inputs/album-input";
 
 @Service()
@@ -34,5 +37,20 @@ export class AlbumResolver {
     if (travel?.userId !== userSession.uuid) throw new ForbiddenError();
     const album = this.albumRepository.create({ name, travel });
     return this.albumRepository.save(album);
+  }
+
+  @FieldResolver(() => Int)
+  async photoCount() {
+    return 90;
+  }
+
+  @FieldResolver(() => [Photo])
+  async photos(@Root() album: Album): Promise<Photo[]> {
+    const curentAlbum = await this.albumRepository.findOne({
+      where: { uuid: album.uuid },
+      relations: ["photos"],
+    });
+    if (!curentAlbum) throw new Error("Cannot find album: " + album.uuid);
+    return curentAlbum.photos;
   }
 }
