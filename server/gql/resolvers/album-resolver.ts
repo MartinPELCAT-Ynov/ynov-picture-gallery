@@ -1,3 +1,5 @@
+import { GraphQLUpload } from "apollo-server-koa";
+import { StorageService } from "../../services/storage/storage-service";
 import { KoaContext } from "server/types/koa-types";
 import {
   Arg,
@@ -17,6 +19,7 @@ import { Repository } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { Album, Photo, Travel, User } from "../entity";
 import { CreateAlbumInput } from "../inputs/album-input";
+import { FileType } from "../scalars/file-scalar";
 
 @Service()
 @Resolver(() => Album)
@@ -25,7 +28,8 @@ export class AlbumResolver {
     @InjectRepository(Album)
     private readonly albumRepository: Repository<Album>,
     @InjectRepository(Travel)
-    private readonly travelRepository: Repository<Travel>
+    private readonly travelRepository: Repository<Travel>,
+    private readonly storageService: StorageService
   ) {}
 
   @Mutation(() => Album)
@@ -55,6 +59,24 @@ export class AlbumResolver {
     }
   }
 
+  @Mutation(() => Album, { nullable: true })
+  async addPhotosToAlbum(
+    @Arg("albumUuid") albumUuid: string,
+    @Arg("files", () => [GraphQLUpload]) upFiles: Promise<FileType>[],
+    @Ctx() { session }: KoaContext
+  ) {
+    const files = await Promise.all(upFiles);
+    const album = await this.albumRepository.findOne(albumUuid);
+    if (!album) throw new Error("Album not found");
+    if ((await this.getAlbumOwner(album)).uuid !== session?.user.uuid) {
+      throw new UnauthorizedError();
+    }
+    const photos = this.storageService.uploadPhotos(files);
+    album.photos = await photos;
+    console.log(files);
+    return null;
+  }
+
   @FieldResolver(() => [Photo])
   async photos(@Root() album: Album): Promise<Photo[]> {
     const curentAlbum = await this.albumRepository.findOne({
@@ -77,7 +99,7 @@ export class AlbumResolver {
     return curentAlbum.photos;
   }
 
-  @FieldResolver(() => User, { nullable: true })
+  @FieldResolver(() => User)
   async owner(@Root() album: Album) {
     const user = await this.getAlbumOwner(album);
     return user;

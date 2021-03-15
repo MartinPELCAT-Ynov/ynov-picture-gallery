@@ -23,6 +23,7 @@
     "clsx": "^1.1.1",
     "cross-env": "^7.0.3",
     "dotenv": "^8.2.0",
+    "firebase-admin": "^9.5.0",
     "graphql": "^15.5.0",
     "ioredis": "^4.23.0",
     "koa": "^2.13.1",

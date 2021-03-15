@@ -1,45 +1,19 @@
+import { FileType } from "server/gql/scalars/file-scalar";
 import { Service } from "typedi";
 import {
   availableStrategies,
-  AvailableStrategies,
   IStorageStrategy,
-} from "./storage-strategy";
+} from "./storage-strategy-interface";
 
 @Service()
 export class StorageService {
-  private _strategy!: IStorageStrategy;
+  private strategy: IStorageStrategy = availableStrategies["firebase"];
 
-  constructor() {
-    console.log("StorageService constructor");
-  }
-
-  public strategy(key: keyof AvailableStrategies): StorageService {
-    this._strategy = availableStrategies[key];
-    return this;
-  }
-
-  private getStrategy(): IStorageStrategy {
-    if (!this._strategy) {
-      this._strategy = availableStrategies["local"];
-    }
-    return this._strategy;
-  }
-
-  async uploadPhotos() {
-    return this.getStrategy().uploadPhotos();
+  async uploadPhotos(files: FileType[]) {
+    return this.strategy.uploadPhotos(files);
   }
 
   async getPhotos() {
-    return this.getStrategy().getPhotos();
+    return this.strategy.getPhotos();
   }
 }
-
-const main = async () => {
-  try {
-    const storageService = new StorageService();
-    await storageService.strategy("local").uploadPhotos();
-  } catch (error: any) {
-    console.error(error.message);
-  }
-};
-main();

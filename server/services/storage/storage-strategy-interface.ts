@@ -1,14 +1,12 @@
-import { FirebaseStorageStrategy } from "./strategies/firebase-strategy";
+import { Photo } from "server/gql/entity";
+import { FileType } from "server/gql/scalars/file-scalar";
+import { FirebaseStorageStrategy } from "./strategies/firebase/firebase-strategy";
 import { LocalStorageStrategy } from "./strategies/local-strategy";
 import { S3StorageStrategy } from "./strategies/s3-strategy";
 
-export type UploadOption = {
-  bucket: string;
-};
-
 export interface IStorageStrategy {
-  uploadPhotos(): Promise<void>;
-  getPhotos(): Promise<void>;
+  uploadPhotos(files: FileType[]): Promise<Photo[]>;
+  getPhotos(): Promise<Photo[]>;
 }
 
 export type AvailableStrategies = {

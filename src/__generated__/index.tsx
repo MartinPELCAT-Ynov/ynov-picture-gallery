@@ -15,6 +15,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
 };
 
 export type Query = {
@@ -41,12 +43,13 @@ export type Album = {
   name: Scalars["String"];
   photos: Array<Photo>;
   photoCount: Scalars["Int"];
-  owner?: Maybe<User>;
+  owner: User;
 };
 
 export type Photo = {
   __typename?: "Photo";
   uuid: Scalars["String"];
+  name: Scalars["String"];
   url: Scalars["String"];
 };
 
@@ -72,6 +75,7 @@ export type Travel = {
 export type Mutation = {
   __typename?: "Mutation";
   createAlbum: Album;
+  addPhotosToAlbum?: Maybe<Album>;
   login: User;
   register: SucessObject;
   logout: SucessObject;
@@ -81,6 +85,11 @@ export type Mutation = {
 
 export type MutationCreateAlbumArgs = {
   input: CreateAlbumInput;
+};
+
+export type MutationAddPhotosToAlbumArgs = {
+  files: Array<Scalars["Upload"]>;
+  albumUuid: Scalars["String"];
 };
 
 export type MutationLoginArgs = {
@@ -144,11 +153,26 @@ export type GetAlbumQuery = { __typename?: "Query" } & {
     Album,
     "photoCount" | "uuid" | "name"
   > & {
-      photos: Array<{ __typename?: "Photo" } & Pick<Photo, "url" | "uuid">>;
-      owner?: Maybe<
-        { __typename?: "User" } & Pick<User, "firstName" | "lastName">
+      photos: Array<
+        { __typename?: "Photo" } & Pick<Photo, "url" | "uuid" | "name">
       >;
+      owner: { __typename?: "User" } & Pick<User, "firstName" | "lastName">;
     };
+};
+
+export type UploadPhotoAlbumMutationVariables = Exact<{
+  albumUuid: Scalars["String"];
+  files: Array<Scalars["Upload"]> | Scalars["Upload"];
+}>;
+
+export type UploadPhotoAlbumMutation = { __typename?: "Mutation" } & {
+  addPhotosToAlbum?: Maybe<
+    { __typename?: "Album" } & {
+      photos: Array<
+        { __typename?: "Photo" } & Pick<Photo, "uuid" | "name" | "url">
+      >;
+    } & PreviewAlbumFragment
+  >;
 };
 
 export type PreviewAlbumFragment = { __typename?: "Album" } & Pick<
@@ -318,6 +342,7 @@ export const GetAlbumDocument = gql`
       photos {
         url
         uuid
+        name
       }
       owner {
         firstName
@@ -369,6 +394,61 @@ export type GetAlbumLazyQueryHookResult = ReturnType<
 export type GetAlbumQueryResult = Apollo.QueryResult<
   GetAlbumQuery,
   GetAlbumQueryVariables
+>;
+export const UploadPhotoAlbumDocument = gql`
+  mutation uploadPhotoAlbum($albumUuid: String!, $files: [Upload!]!) {
+    addPhotosToAlbum(albumUuid: $albumUuid, files: $files) {
+      ...previewAlbum
+      photos {
+        uuid
+        name
+        url
+      }
+    }
+  }
+  ${PreviewAlbumFragmentDoc}
+`;
+export type UploadPhotoAlbumMutationFn = Apollo.MutationFunction<
+  UploadPhotoAlbumMutation,
+  UploadPhotoAlbumMutationVariables
+>;
+
+/**
+ * __useUploadPhotoAlbumMutation__
+ *
+ * To run a mutation, you first call `useUploadPhotoAlbumMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadPhotoAlbumMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadPhotoAlbumMutation, { data, loading, error }] = useUploadPhotoAlbumMutation({
+ *   variables: {
+ *      albumUuid: // value for 'albumUuid'
+ *      files: // value for 'files'
+ *   },
+ * });
+ */
+export function useUploadPhotoAlbumMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UploadPhotoAlbumMutation,
+    UploadPhotoAlbumMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    UploadPhotoAlbumMutation,
+    UploadPhotoAlbumMutationVariables
+  >(UploadPhotoAlbumDocument, baseOptions);
+}
+export type UploadPhotoAlbumMutationHookResult = ReturnType<
+  typeof useUploadPhotoAlbumMutation
+>;
+export type UploadPhotoAlbumMutationResult = Apollo.MutationResult<UploadPhotoAlbumMutation>;
+export type UploadPhotoAlbumMutationOptions = Apollo.BaseMutationOptions<
+  UploadPhotoAlbumMutation,
+  UploadPhotoAlbumMutationVariables
 >;
 export const MeDocument = gql`
   query Me {

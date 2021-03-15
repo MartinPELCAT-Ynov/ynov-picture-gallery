@@ -1,10 +1,12 @@
-import { IStorageStrategy } from "../storage-strategy";
+import { Photo } from "server/gql/entity";
+import { FileType } from "server/gql/scalars/file-scalar";
+import { StorageStrategy } from "./storage-strategy";
 
-export class LocalStorageStrategy implements IStorageStrategy {
-  async uploadPhotos(): Promise<void> {
-    throw new Error("Method upload local not implemented.");
+export class LocalStorageStrategy extends StorageStrategy {
+  uploadPhotos(_files: FileType[]): Promise<Photo[]> {
+    throw new Error("Method not implemented.");
   }
-  async getPhotos(): Promise<void> {
-    throw new Error("Method get local not implemented.");
+  getPhotos(): Promise<Photo[]> {
+    throw new Error("Method not implemented.");
   }
 }

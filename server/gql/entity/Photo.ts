@@ -8,6 +8,10 @@ export class Photo {
   @Field()
   uuid!: string;
 
+  @Field()
+  @Column()
+  name!: string;
+
   @Column()
   @Field()
   url!: string;

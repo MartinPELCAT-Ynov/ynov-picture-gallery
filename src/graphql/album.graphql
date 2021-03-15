@@ -12,10 +12,22 @@ query getAlbum($id: String!) {
     photos {
       url
       uuid
+      name
     }
     owner {
       firstName
       lastName
+    }
+  }
+}
+
+mutation uploadPhotoAlbum($albumUuid: String!, $files: [Upload!]!) {
+  addPhotosToAlbum(albumUuid: $albumUuid, files: $files) {
+    ...previewAlbum
+    photos {
+      uuid
+      name
+      url
     }
   }
 }
