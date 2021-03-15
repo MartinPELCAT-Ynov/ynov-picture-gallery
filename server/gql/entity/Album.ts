@@ -26,7 +26,7 @@ export class Album {
   @Field()
   name!: string;
 
-  @ManyToMany(() => Photo)
+  @ManyToMany(() => Photo, { cascade: true })
   @JoinTable()
   photos!: Photo[];
 

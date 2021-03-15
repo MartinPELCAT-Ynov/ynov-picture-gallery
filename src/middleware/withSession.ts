@@ -33,7 +33,7 @@ const redirectPath = (): {
 } => {
   return {
     redirect: {
-      destination: "/auth/login",
+      destination: "/explore",
       permanent: false,
     },
   };
