@@ -15,15 +15,39 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
-  DateTime: any;
 };
 
 export type Query = {
   __typename?: "Query";
+  album: Album;
   me: User;
   myTravels: Array<Travel>;
+  getTravel: Travel;
   users?: Maybe<Array<User>>;
+};
+
+export type QueryAlbumArgs = {
+  id: Scalars["String"];
+};
+
+export type QueryGetTravelArgs = {
+  id: Scalars["String"];
+};
+
+export type Album = {
+  __typename?: "Album";
+  uuid: Scalars["String"];
+  isPublic: Scalars["Boolean"];
+  name: Scalars["String"];
+  photos: Array<Photo>;
+  photoCount: Scalars["Int"];
+  owner?: Maybe<User>;
+};
+
+export type Photo = {
+  __typename?: "Photo";
+  uuid: Scalars["String"];
+  url: Scalars["String"];
 };
 
 export type User = {
@@ -37,71 +61,26 @@ export type User = {
 
 export type Travel = {
   __typename?: "Travel";
-  entity: ReactionableEntity;
+  uuid: Scalars["String"];
   name: Scalars["String"];
-  description: Scalars["String"];
-  destinations: Array<Destination>;
+  description?: Maybe<Scalars["String"]>;
+  likeCounts: Scalars["Int"];
   albums: Array<Album>;
-  user: User;
-};
-
-export type ReactionableEntity = {
-  __typename?: "ReactionableEntity";
-  uuid: Scalars["String"];
-  likes: Array<Like>;
-  comments: Array<Comment>;
-  likesCount: Scalars["Int"];
-  commentCount: Scalars["Int"];
-};
-
-export type Like = {
-  __typename?: "Like";
-  entity_uuid: ReactionableEntity;
-  user: User;
-};
-
-export type Comment = {
-  __typename?: "Comment";
-  entity_uuid: ReactionableEntity;
-  uuid: Scalars["String"];
-  user: User;
-  content: Scalars["String"];
-};
-
-export type Destination = {
-  __typename?: "Destination";
-  entity: ReactionableEntity;
-  name: Scalars["String"];
-  arrivalDate: Scalars["DateTime"];
-  departureDate: Scalars["DateTime"];
-  illustrations: Array<Photo>;
-};
-
-export type Photo = {
-  __typename?: "Photo";
-  entity: ReactionableEntity;
-  url: Scalars["String"];
-};
-
-export type Album = {
-  __typename?: "Album";
-  entity: ReactionableEntity;
-  public: Scalars["Boolean"];
-  photos: Array<Photo>;
-  albumInvitations: Array<AlbumInvitation>;
-};
-
-export type AlbumInvitation = {
-  __typename?: "AlbumInvitation";
-  email: Scalars["String"];
+  albumsCount: Scalars["Int"];
 };
 
 export type Mutation = {
   __typename?: "Mutation";
+  createAlbum: Album;
   login: User;
   register: SucessObject;
   logout: SucessObject;
   validateEmail: SucessObject;
+  createTravel?: Maybe<Travel>;
+};
+
+export type MutationCreateAlbumArgs = {
+  input: CreateAlbumInput;
 };
 
 export type MutationLoginArgs = {
@@ -114,6 +93,15 @@ export type MutationRegisterArgs = {
 
 export type MutationValidateEmailArgs = {
   key: Scalars["String"];
+};
+
+export type MutationCreateTravelArgs = {
+  input: CreateTravelInput;
+};
+
+export type CreateAlbumInput = {
+  travelId: Scalars["String"];
+  name: Scalars["String"];
 };
 
 export type LoginInput = {
@@ -132,6 +120,41 @@ export type RegisterInput = {
   email: Scalars["String"];
   password: Scalars["String"];
 };
+
+export type CreateTravelInput = {
+  name: Scalars["String"];
+  description?: Maybe<Scalars["String"]>;
+};
+
+export type CreateAlbumMutationVariables = Exact<{
+  travelId: Scalars["String"];
+  name: Scalars["String"];
+}>;
+
+export type CreateAlbumMutation = { __typename?: "Mutation" } & {
+  createAlbum: { __typename?: "Album" } & PreviewAlbumFragment;
+};
+
+export type GetAlbumQueryVariables = Exact<{
+  id: Scalars["String"];
+}>;
+
+export type GetAlbumQuery = { __typename?: "Query" } & {
+  album: { __typename?: "Album" } & Pick<
+    Album,
+    "photoCount" | "uuid" | "name"
+  > & {
+      photos: Array<{ __typename?: "Photo" } & Pick<Photo, "url" | "uuid">>;
+      owner?: Maybe<
+        { __typename?: "User" } & Pick<User, "firstName" | "lastName">
+      >;
+    };
+};
+
+export type PreviewAlbumFragment = { __typename?: "Album" } & Pick<
+  Album,
+  "name" | "uuid" | "isPublic" | "photoCount"
+>;
 
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -184,11 +207,42 @@ export type ValidateEmailMutation = { __typename?: "Mutation" } & {
 export type MyTravelsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MyTravelsQuery = { __typename?: "Query" } & {
-  myTravels: Array<
-    { __typename?: "Travel" } & Pick<Travel, "name" | "description">
-  >;
+  myTravels: Array<{ __typename?: "Travel" } & PreviewTravelFragment>;
 };
 
+export type CreateTravelMutationVariables = Exact<{
+  name: Scalars["String"];
+  description?: Maybe<Scalars["String"]>;
+}>;
+
+export type CreateTravelMutation = { __typename?: "Mutation" } & {
+  createTravel?: Maybe<{ __typename?: "Travel" } & PreviewTravelFragment>;
+};
+
+export type PreviewTravelFragment = { __typename?: "Travel" } & Pick<
+  Travel,
+  "uuid" | "name" | "description" | "albumsCount"
+>;
+
+export type GetTravelQueryVariables = Exact<{
+  id: Scalars["String"];
+}>;
+
+export type GetTravelQuery = { __typename?: "Query" } & {
+  getTravel: { __typename?: "Travel" } & Pick<
+    Travel,
+    "uuid" | "name" | "description"
+  > & { albums: Array<{ __typename?: "Album" } & PreviewAlbumFragment> };
+};
+
+export const PreviewAlbumFragmentDoc = gql`
+  fragment previewAlbum on Album {
+    name
+    uuid
+    isPublic
+    photoCount
+  }
+`;
 export const UserFieldsFragmentDoc = gql`
   fragment userFields on User {
     uuid
@@ -197,6 +251,125 @@ export const UserFieldsFragmentDoc = gql`
     email
   }
 `;
+export const PreviewTravelFragmentDoc = gql`
+  fragment previewTravel on Travel {
+    uuid
+    name
+    description
+    albumsCount
+  }
+`;
+export const CreateAlbumDocument = gql`
+  mutation createAlbum($travelId: String!, $name: String!) {
+    createAlbum(input: { travelId: $travelId, name: $name }) {
+      ...previewAlbum
+    }
+  }
+  ${PreviewAlbumFragmentDoc}
+`;
+export type CreateAlbumMutationFn = Apollo.MutationFunction<
+  CreateAlbumMutation,
+  CreateAlbumMutationVariables
+>;
+
+/**
+ * __useCreateAlbumMutation__
+ *
+ * To run a mutation, you first call `useCreateAlbumMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateAlbumMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createAlbumMutation, { data, loading, error }] = useCreateAlbumMutation({
+ *   variables: {
+ *      travelId: // value for 'travelId'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useCreateAlbumMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateAlbumMutation,
+    CreateAlbumMutationVariables
+  >
+) {
+  return Apollo.useMutation<CreateAlbumMutation, CreateAlbumMutationVariables>(
+    CreateAlbumDocument,
+    baseOptions
+  );
+}
+export type CreateAlbumMutationHookResult = ReturnType<
+  typeof useCreateAlbumMutation
+>;
+export type CreateAlbumMutationResult = Apollo.MutationResult<CreateAlbumMutation>;
+export type CreateAlbumMutationOptions = Apollo.BaseMutationOptions<
+  CreateAlbumMutation,
+  CreateAlbumMutationVariables
+>;
+export const GetAlbumDocument = gql`
+  query getAlbum($id: String!) {
+    album(id: $id) {
+      photoCount
+      uuid
+      name
+      photos {
+        url
+        uuid
+      }
+      owner {
+        firstName
+        lastName
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetAlbumQuery__
+ *
+ * To run a query within a React component, call `useGetAlbumQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAlbumQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAlbumQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetAlbumQuery(
+  baseOptions: Apollo.QueryHookOptions<GetAlbumQuery, GetAlbumQueryVariables>
+) {
+  return Apollo.useQuery<GetAlbumQuery, GetAlbumQueryVariables>(
+    GetAlbumDocument,
+    baseOptions
+  );
+}
+export function useGetAlbumLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAlbumQuery,
+    GetAlbumQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<GetAlbumQuery, GetAlbumQueryVariables>(
+    GetAlbumDocument,
+    baseOptions
+  );
+}
+export type GetAlbumQueryHookResult = ReturnType<typeof useGetAlbumQuery>;
+export type GetAlbumLazyQueryHookResult = ReturnType<
+  typeof useGetAlbumLazyQuery
+>;
+export type GetAlbumQueryResult = Apollo.QueryResult<
+  GetAlbumQuery,
+  GetAlbumQueryVariables
+>;
 export const MeDocument = gql`
   query Me {
     me {
@@ -442,10 +615,10 @@ export type ValidateEmailMutationOptions = Apollo.BaseMutationOptions<
 export const MyTravelsDocument = gql`
   query myTravels {
     myTravels {
-      name
-      description
+      ...previewTravel
     }
   }
+  ${PreviewTravelFragmentDoc}
 `;
 
 /**
@@ -489,4 +662,111 @@ export type MyTravelsLazyQueryHookResult = ReturnType<
 export type MyTravelsQueryResult = Apollo.QueryResult<
   MyTravelsQuery,
   MyTravelsQueryVariables
+>;
+export const CreateTravelDocument = gql`
+  mutation createTravel($name: String!, $description: String) {
+    createTravel(input: { name: $name, description: $description }) {
+      ...previewTravel
+    }
+  }
+  ${PreviewTravelFragmentDoc}
+`;
+export type CreateTravelMutationFn = Apollo.MutationFunction<
+  CreateTravelMutation,
+  CreateTravelMutationVariables
+>;
+
+/**
+ * __useCreateTravelMutation__
+ *
+ * To run a mutation, you first call `useCreateTravelMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTravelMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createTravelMutation, { data, loading, error }] = useCreateTravelMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      description: // value for 'description'
+ *   },
+ * });
+ */
+export function useCreateTravelMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateTravelMutation,
+    CreateTravelMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    CreateTravelMutation,
+    CreateTravelMutationVariables
+  >(CreateTravelDocument, baseOptions);
+}
+export type CreateTravelMutationHookResult = ReturnType<
+  typeof useCreateTravelMutation
+>;
+export type CreateTravelMutationResult = Apollo.MutationResult<CreateTravelMutation>;
+export type CreateTravelMutationOptions = Apollo.BaseMutationOptions<
+  CreateTravelMutation,
+  CreateTravelMutationVariables
+>;
+export const GetTravelDocument = gql`
+  query getTravel($id: String!) {
+    getTravel(id: $id) {
+      uuid
+      name
+      description
+      albums {
+        ...previewAlbum
+      }
+    }
+  }
+  ${PreviewAlbumFragmentDoc}
+`;
+
+/**
+ * __useGetTravelQuery__
+ *
+ * To run a query within a React component, call `useGetTravelQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTravelQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTravelQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetTravelQuery(
+  baseOptions: Apollo.QueryHookOptions<GetTravelQuery, GetTravelQueryVariables>
+) {
+  return Apollo.useQuery<GetTravelQuery, GetTravelQueryVariables>(
+    GetTravelDocument,
+    baseOptions
+  );
+}
+export function useGetTravelLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetTravelQuery,
+    GetTravelQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<GetTravelQuery, GetTravelQueryVariables>(
+    GetTravelDocument,
+    baseOptions
+  );
+}
+export type GetTravelQueryHookResult = ReturnType<typeof useGetTravelQuery>;
+export type GetTravelLazyQueryHookResult = ReturnType<
+  typeof useGetTravelLazyQuery
+>;
+export type GetTravelQueryResult = Apollo.QueryResult<
+  GetTravelQuery,
+  GetTravelQueryVariables
 >;

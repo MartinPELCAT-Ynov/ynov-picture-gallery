@@ -1,0 +1,28 @@
+mutation createAlbum($travelId: String!, $name: String!) {
+  createAlbum(input: { travelId: $travelId, name: $name }) {
+    ...previewAlbum
+  }
+}
+
+query getAlbum($id: String!) {
+  album(id: $id) {
+    photoCount
+    uuid
+    name
+    photos {
+      url
+      uuid
+    }
+    owner {
+      firstName
+      lastName
+    }
+  }
+}
+
+fragment previewAlbum on Album {
+  name
+  uuid
+  isPublic
+  photoCount
+}

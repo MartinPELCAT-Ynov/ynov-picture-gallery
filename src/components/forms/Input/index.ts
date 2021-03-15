@@ -1,4 +1,5 @@
 import { DefaultInput as Default } from "./input";
+import { TextArea } from "./text-area";
 
 export type InputProps = {
   label: string;
@@ -9,4 +10,4 @@ export type InputProps = {
   defaultValue?: string | number;
 };
 
-export const Input = { Default };
+export const Input = { Default, TextArea };

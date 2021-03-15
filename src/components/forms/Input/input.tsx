@@ -1,4 +1,8 @@
+import { DetailedHTMLProps, InputHTMLAttributes } from "react";
 import { InputProps } from ".";
+
+type DefaultInputProps = InputProps &
+  DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 export const DefaultInput = ({
   label,
@@ -7,7 +11,8 @@ export const DefaultInput = ({
   placeholder = label,
   required = false,
   defaultValue,
-}: InputProps) => {
+  ...rest
+}: DefaultInputProps) => {
   return (
     <div className="flex flex-col flex-1">
       <label htmlFor={name}>
@@ -15,6 +20,7 @@ export const DefaultInput = ({
         {required && <span className="text-red-600 pl-0.5">*</span>}
       </label>
       <input
+        {...rest}
         type={type}
         name={name}
         id={name}

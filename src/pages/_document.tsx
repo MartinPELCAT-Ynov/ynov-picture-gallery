@@ -5,9 +5,8 @@ export default class CustomDocument extends Document {
     return (
       <Html>
         <Head />
-        <body className="antialiased overflow-y-scroll">
+        <body className="text-gray-800 antialiased overflow-y-scroll">
           <Main />
-          <div id="modal-root"></div>
           <NextScript />
         </body>
       </Html>
