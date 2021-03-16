@@ -1,9 +1,8 @@
 import { Photo } from "server/gql/entity";
 import { FileType } from "server/gql/scalars/file-scalar";
 import * as admin from "firebase-admin";
-import { randomBytes } from "crypto";
 import { StorageStrategy } from "../storage-strategy";
-import { join } from "path";
+import { v4 } from "uuid";
 
 const serviceAccount = require("./ynov-picture-gallery-firebase-adminsdk-irsqm-6181038dbf.json");
 
@@ -25,23 +24,43 @@ export class FirebaseStorageStrategy extends StorageStrategy {
   }
 
   async uploadPhotos(files: FileType[]): Promise<Photo[]> {
+    const photos: Photo[] = [];
     for (const file of files) {
-      const token = randomBytes(32).toString("hex");
-      const path = join(
-        __dirname,
-        "../../../../upload/",
-        `./tmp/${token}-${file.filename}`
-      );
-      await this.createTmpFile(file, path);
+      const token = v4();
+      const fileName = `${token}-${file.filename}`;
+      const path = await this.createTmpFile(file, fileName);
       // const uploaded =
-      await this.getBucket().upload(path, { gzip: true });
-      // console.log(uploaded[0].publicUrl());
-      this.deleteTmpFile(path);
+      await this.getBucket().upload(path, {
+        destination: fileName,
+        gzip: true,
+      });
+
+      this.deleteTmpFile(fileName);
+
+      photos.push({ name: file.filename, url: fileName });
     }
 
-    return [];
+    return photos;
   }
-  getPhotos(): Promise<Photo[]> {
+  async getPhotos(photos: Photo[]): Promise<Photo[]> {
+    const returnPhotos = photos.map(
+      async (photo): Promise<Photo> => {
+        const [url] = await this.getBucket()
+          .file(photo.url)
+          .getSignedUrl({
+            action: "read",
+            expires: Date.now() + 24000,
+            version: "v4",
+          });
+        return { ...photo, url };
+      }
+    );
+
+    return Promise.all(returnPhotos);
+  }
+
+  deletePhotos(_fileNames: string[]): Promise<void> {
     throw new Error("Method not implemented.");
   }
 }
+// https://firebasestorage.googleapis.com/v0/b/ynov-picture-gallery.appspot.com/o/08533319-3730-49a4-ba3a-8ca8e29cb638-EAHX9624.JPG?alt=media&token=4376b376-7218-4fa9-b185-f7a1cc948d74

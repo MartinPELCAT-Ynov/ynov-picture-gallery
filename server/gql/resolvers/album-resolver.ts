@@ -59,7 +59,7 @@ export class AlbumResolver {
     }
   }
 
-  @Mutation(() => Album, { nullable: true })
+  @Mutation(() => Album)
   async addPhotosToAlbum(
     @Arg("albumUuid") albumUuid: string,
     @Arg("files", () => [GraphQLUpload]) upFiles: Promise<FileType>[],
@@ -71,10 +71,9 @@ export class AlbumResolver {
     if ((await this.getAlbumOwner(album)).uuid !== session?.user.uuid) {
       throw new UnauthorizedError();
     }
-    const photos = this.storageService.uploadPhotos(files);
-    album.photos = await photos;
-    console.log(files);
-    return null;
+    const photos = await this.storageService.uploadPhotos(files);
+    album.photos = [...(album.photos || []), ...photos];
+    return await this.albumRepository.save(album);
   }
 
   @FieldResolver(() => [Photo])
@@ -84,7 +83,8 @@ export class AlbumResolver {
       relations: ["photos"],
     });
     if (!curentAlbum) throw new Error("Cannot find album: " + album.uuid);
-    return curentAlbum.photos;
+
+    return this.storageService.getPhotos(curentAlbum.photos);
   }
 
   @FieldResolver(() => Int)

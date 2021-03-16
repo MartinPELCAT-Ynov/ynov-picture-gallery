@@ -6,7 +6,8 @@ import { S3StorageStrategy } from "./strategies/s3-strategy";
 
 export interface IStorageStrategy {
   uploadPhotos(files: FileType[]): Promise<Photo[]>;
-  getPhotos(): Promise<Photo[]>;
+  getPhotos(photos: Photo[]): Promise<Photo[]>;
+  deletePhotos(fileNames: string[]): Promise<void>;
 }
 
 export type AvailableStrategies = {

@@ -1,6 +1,12 @@
 import { useRouter } from "next/router";
-import { ChangeEventHandler, DragEventHandler, useState } from "react";
+import {
+  ChangeEventHandler,
+  DragEventHandler,
+  useContext,
+  useState,
+} from "react";
 import { Button } from "src/components/forms/Button";
+import { AlbumContext } from "src/contexts/album-context";
 import { useUploadPhotoAlbumMutation } from "src/__generated__";
 
 type FileAndPreview = {
@@ -10,6 +16,7 @@ type FileAndPreview = {
 
 export const UploadImageModal = () => {
   const [files, setFiles] = useState<FileAndPreview[]>([]);
+  const { setAlbum } = useContext(AlbumContext);
   const { query } = useRouter();
 
   const [upload] = useUploadPhotoAlbumMutation();
@@ -41,9 +48,15 @@ export const UploadImageModal = () => {
   const handleUpload = async () => {
     try {
       const fls = files.map((f) => f.file);
-      await upload({
+      const { data } = await upload({
         variables: { files: fls, albumUuid: query.id as string },
       });
+      if (data?.addPhotosToAlbum?.photos) {
+        setAlbum((album) => ({
+          ...album!,
+          photos: data.addPhotosToAlbum?.photos!,
+        }));
+      }
     } catch (error) {
       console.error(error);
       //DO NOTHING
