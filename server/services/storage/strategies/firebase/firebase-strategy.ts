@@ -59,8 +59,11 @@ export class FirebaseStorageStrategy extends StorageStrategy {
     return Promise.all(returnPhotos);
   }
 
-  deletePhotos(_fileNames: string[]): Promise<void> {
-    throw new Error("Method not implemented.");
+  async deletePhotos(urls: string[]): Promise<void> {
+    const deleteMap = urls.map((url) => {
+      return this.getBucket().file(url).delete();
+    });
+    await Promise.all(deleteMap);
   }
 }
 // https://firebasestorage.googleapis.com/v0/b/ynov-picture-gallery.appspot.com/o/08533319-3730-49a4-ba3a-8ca8e29cb638-EAHX9624.JPG?alt=media&token=4376b376-7218-4fa9-b185-f7a1cc948d74

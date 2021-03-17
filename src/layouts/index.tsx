@@ -4,9 +4,9 @@ import { Header } from "src/components/header";
 
 export const Layout: FC = ({ children }) => {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen max-h-screen bg-gray-50">
       <Header />
-      <main className="flex-1 relative">{children}</main>
+      <main className="flex-1 relative w-full flex flex-col">{children}</main>
       <Footer />
     </div>
   );

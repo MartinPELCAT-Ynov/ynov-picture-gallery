@@ -50,7 +50,7 @@ export class AlbumResolver {
     const album = await this.albumRepository.findOne({ where: { uuid } });
     if (!album) throw new Error("Album does not exist");
     const sessionUser = session?.user as User | null;
-    const user = await this.getAlbumOwner(album);
+    const user = await album.getOwner();
     const isPublic = album.isPublic;
     if (!isPublic && sessionUser?.uuid !== user.uuid) {
       throw new UnauthorizedError();
@@ -68,7 +68,7 @@ export class AlbumResolver {
     const files = await Promise.all(upFiles);
     const album = await this.albumRepository.findOne(albumUuid);
     if (!album) throw new Error("Album not found");
-    if ((await this.getAlbumOwner(album)).uuid !== session?.user.uuid) {
+    if ((await album.getOwner()).uuid !== session?.user.uuid) {
       throw new UnauthorizedError();
     }
     const photos = await this.storageService.uploadPhotos(files);
@@ -101,16 +101,6 @@ export class AlbumResolver {
 
   @FieldResolver(() => User)
   async owner(@Root() album: Album) {
-    const user = await this.getAlbumOwner(album);
-    return user;
-  }
-
-  private async getAlbumOwner(album: Album): Promise<User> {
-    const travel = await this.travelRepository.findOne({
-      where: { entity: album.travelId },
-      relations: ["user"],
-    });
-    if (!travel) throw new Error("Faild to fetch user");
-    return travel.user;
+    return album.getOwner();
   }
 }

@@ -75,11 +75,12 @@ export type Travel = {
 export type Mutation = {
   __typename?: "Mutation";
   createAlbum: Album;
-  addPhotosToAlbum?: Maybe<Album>;
+  addPhotosToAlbum: Album;
   login: User;
   register: SucessObject;
   logout: SucessObject;
   validateEmail: SucessObject;
+  deletePhotos: SucessObject;
   createTravel?: Maybe<Travel>;
 };
 
@@ -102,6 +103,10 @@ export type MutationRegisterArgs = {
 
 export type MutationValidateEmailArgs = {
   key: Scalars["String"];
+};
+
+export type MutationDeletePhotosArgs = {
+  photoIds: Array<Scalars["String"]>;
 };
 
 export type MutationCreateTravelArgs = {
@@ -166,13 +171,11 @@ export type UploadPhotoAlbumMutationVariables = Exact<{
 }>;
 
 export type UploadPhotoAlbumMutation = { __typename?: "Mutation" } & {
-  addPhotosToAlbum?: Maybe<
-    { __typename?: "Album" } & {
-      photos: Array<
-        { __typename?: "Photo" } & Pick<Photo, "uuid" | "name" | "url">
-      >;
-    } & PreviewAlbumFragment
-  >;
+  addPhotosToAlbum: { __typename?: "Album" } & {
+    photos: Array<
+      { __typename?: "Photo" } & Pick<Photo, "uuid" | "name" | "url">
+    >;
+  } & PreviewAlbumFragment;
 };
 
 export type PreviewAlbumFragment = { __typename?: "Album" } & Pick<
@@ -226,6 +229,14 @@ export type ValidateEmailMutation = { __typename?: "Mutation" } & {
     SucessObject,
     "success"
   >;
+};
+
+export type DeleteImagesMutationVariables = Exact<{
+  ids: Array<Scalars["String"]> | Scalars["String"];
+}>;
+
+export type DeleteImagesMutation = { __typename?: "Mutation" } & {
+  deletePhotos: { __typename?: "SucessObject" } & Pick<SucessObject, "success">;
 };
 
 export type MyTravelsQueryVariables = Exact<{ [key: string]: never }>;
@@ -691,6 +702,54 @@ export type ValidateEmailMutationResult = Apollo.MutationResult<ValidateEmailMut
 export type ValidateEmailMutationOptions = Apollo.BaseMutationOptions<
   ValidateEmailMutation,
   ValidateEmailMutationVariables
+>;
+export const DeleteImagesDocument = gql`
+  mutation deleteImages($ids: [String!]!) {
+    deletePhotos(photoIds: $ids) {
+      success
+    }
+  }
+`;
+export type DeleteImagesMutationFn = Apollo.MutationFunction<
+  DeleteImagesMutation,
+  DeleteImagesMutationVariables
+>;
+
+/**
+ * __useDeleteImagesMutation__
+ *
+ * To run a mutation, you first call `useDeleteImagesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteImagesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteImagesMutation, { data, loading, error }] = useDeleteImagesMutation({
+ *   variables: {
+ *      ids: // value for 'ids'
+ *   },
+ * });
+ */
+export function useDeleteImagesMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DeleteImagesMutation,
+    DeleteImagesMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    DeleteImagesMutation,
+    DeleteImagesMutationVariables
+  >(DeleteImagesDocument, baseOptions);
+}
+export type DeleteImagesMutationHookResult = ReturnType<
+  typeof useDeleteImagesMutation
+>;
+export type DeleteImagesMutationResult = Apollo.MutationResult<DeleteImagesMutation>;
+export type DeleteImagesMutationOptions = Apollo.BaseMutationOptions<
+  DeleteImagesMutation,
+  DeleteImagesMutationVariables
 >;
 export const MyTravelsDocument = gql`
   query myTravels {

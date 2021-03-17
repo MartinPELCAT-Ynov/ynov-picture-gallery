@@ -21,31 +21,27 @@ export default function Travel() {
     <Layout>
       <TravelContextProvider>
         <AlbumContextProvider>
-          <div className="absolute h-full w-full">
-            <div className="divide-y flex-1 absolute flex flex-col h-full">
-              <div className="px-10 py-5 flex justify-between items-center">
-                <span className="text-4xl font-light flex items-center space-x-4">
-                  <PreviouIcon />
-                  <AlbumContext.Consumer>
-                    {({ album }) => (
-                      <span className="italic font-medium text-4xl">
-                        {album?.name}
-                      </span>
-                    )}
-                  </AlbumContext.Consumer>
-                </span>
-                <div className="flex space-x-4">
-                  <Button.Create label="Invite" onClick={showInvite} />
-                  <Button.Create label="Upload" onClick={show} />
-                </div>
-              </div>
-              <div className="flex h-full">
-                <div className="w-3/4">
-                  <AlbumView />
-                </div>
-                <div className="w-1/4 bg-gray-700">Column</div>
-              </div>
+          <div className="px-10 py-5 flex justify-between items-center">
+            <span className="text-4xl font-light flex items-center space-x-4">
+              <PreviouIcon />
+              <AlbumContext.Consumer>
+                {({ album }) => (
+                  <span className="italic font-medium text-4xl">
+                    {album?.name}
+                  </span>
+                )}
+              </AlbumContext.Consumer>
+            </span>
+            <div className="flex space-x-4">
+              <Button.Create label="Invite" onClick={showInvite} />
+              <Button.Create label="Upload" onClick={show} />
             </div>
+          </div>
+          <div className="flex h-full w-full flex-1">
+            <div className="w-3/4 overflow-y-auto">
+              <AlbumView />
+            </div>
+            <div className="w-1/4 bg-gray-700">Column</div>
           </div>
           <Modal content={content} />
           <Modal content={inviteContent} />

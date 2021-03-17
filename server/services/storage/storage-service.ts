@@ -17,4 +17,9 @@ export class StorageService {
   async getPhotos(photos: Photo[]) {
     return this.strategy.getPhotos(photos);
   }
+
+  async deletePhotos(photos: Photo[]) {
+    const photoUrls = photos.map((photo) => photo.url);
+    return this.strategy.deletePhotos(photoUrls);
+  }
 }

@@ -7,6 +7,7 @@ import {
 } from "react";
 import { Button } from "src/components/forms/Button";
 import { AlbumContext } from "src/contexts/album-context";
+import { ModalContext } from "src/contexts/modal-context";
 import { useUploadPhotoAlbumMutation } from "src/__generated__";
 
 type FileAndPreview = {
@@ -18,8 +19,9 @@ export const UploadImageModal = () => {
   const [files, setFiles] = useState<FileAndPreview[]>([]);
   const { setAlbum } = useContext(AlbumContext);
   const { query } = useRouter();
+  const { hide } = useContext(ModalContext);
 
-  const [upload] = useUploadPhotoAlbumMutation();
+  const [upload, { loading }] = useUploadPhotoAlbumMutation();
 
   const dragOver: DragEventHandler<HTMLDivElement> = (e) => {
     e.preventDefault();
@@ -57,6 +59,7 @@ export const UploadImageModal = () => {
           photos: data.addPhotosToAlbum?.photos!,
         }));
       }
+      hide();
     } catch (error) {
       console.error(error);
       //DO NOTHING
@@ -87,7 +90,7 @@ export const UploadImageModal = () => {
     };
 
     return (
-      <div className="w-14 h-14 relative">
+      <div className="w-14 h-14 relative m-1">
         <img
           src={preview}
           alt=""
@@ -129,7 +132,7 @@ export const UploadImageModal = () => {
         </label>
       </div>
 
-      <div className="flex flex-wrap space-x-2 my-3">
+      <div className="flex flex-wrap justify-center mt-2">
         {files.map((file) => {
           return <ImagePreview {...file} key={file.file.name} />;
         })}
@@ -139,6 +142,7 @@ export const UploadImageModal = () => {
         <div className="w-1/2">
           <Button.Default
             label="Upload"
+            loading={loading}
             className="bg-indigo-500 text-white"
             onClick={handleUpload}
           />

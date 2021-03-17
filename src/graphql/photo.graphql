@@ -1,0 +1,5 @@
+mutation deleteImages($ids: [String!]!) {
+  deletePhotos(photoIds: $ids) {
+    success
+  }
+}
