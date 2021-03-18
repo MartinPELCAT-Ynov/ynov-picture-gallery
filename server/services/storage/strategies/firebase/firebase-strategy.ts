@@ -4,7 +4,7 @@ import * as admin from "firebase-admin";
 import { StorageStrategy } from "../storage-strategy";
 import { v4 } from "uuid";
 
-const serviceAccount = require("./ynov-picture-gallery-firebase-adminsdk-irsqm-6181038dbf.json");
+import * as serviceAccount from "./firebase.json";
 
 export class FirebaseStorageStrategy extends StorageStrategy {
   private storage: admin.storage.Storage;
@@ -12,7 +12,7 @@ export class FirebaseStorageStrategy extends StorageStrategy {
   constructor() {
     super();
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
+      credential: admin.credential.cert(serviceAccount as any),
       storageBucket: "gs://ynov-picture-gallery.appspot.com",
     });
 
