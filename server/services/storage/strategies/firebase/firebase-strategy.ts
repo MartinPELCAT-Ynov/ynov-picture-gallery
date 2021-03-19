@@ -4,6 +4,7 @@ import * as admin from "firebase-admin";
 import { StorageStrategy } from "../storage-strategy";
 import { v4 } from "uuid";
 
+//Fichier generer depuis la console firebase
 import * as serviceAccount from "./firebase.json";
 
 export class FirebaseStorageStrategy extends StorageStrategy {
@@ -66,4 +67,3 @@ export class FirebaseStorageStrategy extends StorageStrategy {
     await Promise.all(deleteMap);
   }
 }
-// https://firebasestorage.googleapis.com/v0/b/ynov-picture-gallery.appspot.com/o/08533319-3730-49a4-ba3a-8ca8e29cb638-EAHX9624.JPG?alt=media&token=4376b376-7218-4fa9-b185-f7a1cc948d74

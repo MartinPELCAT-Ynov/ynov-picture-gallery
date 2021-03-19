@@ -12,6 +12,7 @@ import { resolvers } from "./gql/resolvers";
 import { sessionMiddleware } from "./config/session";
 import { nextRouter } from "./rest/controllers/next-controller";
 import { connectDatabase } from "./utils/database-utils";
+import { setupUploadFolder } from "./utils/upload-utils";
 
 useContainer(Container);
 
@@ -25,7 +26,7 @@ export const server = async () => {
   return app.prepare().then(async () => {
     try {
       logger.info("Starting Application");
-
+      await setupUploadFolder();
       const server = new Koa();
 
       await connectDatabase();

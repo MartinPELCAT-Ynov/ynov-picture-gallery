@@ -1,7 +1,8 @@
-import { createWriteStream, unlink } from "fs";
+import { createWriteStream, promises } from "fs";
 import { join } from "path";
 import { Photo } from "server/gql/entity";
 import { FileType } from "server/gql/scalars/file-scalar";
+import { UPLOAD_TMP_FOLDER } from "../../../utils/upload-utils";
 import { IStorageStrategy } from "../storage-strategy-interface";
 
 export abstract class StorageStrategy implements IStorageStrategy {
@@ -10,7 +11,7 @@ export abstract class StorageStrategy implements IStorageStrategy {
   abstract deletePhotos(fileNames: string[]): Promise<void>;
 
   protected async createTmpFile(file: FileType, filename: string) {
-    const path = join(__dirname, "../../../upload/tmp/", filename);
+    const path = join(UPLOAD_TMP_FOLDER, filename);
 
     const { createReadStream } = file;
     const stream = createReadStream();
@@ -23,12 +24,7 @@ export abstract class StorageStrategy implements IStorageStrategy {
     return path;
   }
   protected deleteTmpFile(filename: string) {
-    const path = join(__dirname, "../../../upload/tmp/", filename);
-    return new Promise<void>((res, rej) => {
-      unlink(path, (err) => {
-        if (err) rej(err);
-        res();
-      });
-    });
+    const path = join(UPLOAD_TMP_FOLDER, filename);
+    return promises.unlink(path);
   }
 }
