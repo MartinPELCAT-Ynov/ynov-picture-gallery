@@ -32,66 +32,17 @@ Enfin, une autre évolution du projet serait l’ajout d’un système de«likes
   - Type-GraphQL
   - Apollo Server
 
-# Entities
+# Use Case
 
-```typescript
-export class User {
-  uuid: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  travels: Travel[];
-}
+![Diagramme de classe](./docs/use-case.png)
 
-export class Travel implements Reaction {
-  uuid: string;
-  albums: Album[];
-  name: string;
-  description: string;
-  destinations: Destination[];
-}
+# Diagramme Class
 
-export class Album implements Reaction {
-  uuid: string;
-  public: boolean;
-  photos: photo[];
-  albumInvitations: AlbumInvitation[];
-}
+![Diagramme de classe](./docs/class.png)
 
-export class Photo implements Reaction {
-  uuid: string;
-  url: string;
-}
+# Diagramme de déploiement
 
-export class AlbumInvitation {
-  album: Album;
-  email: string;
-}
-
-export class Destination implements Reaction {
-  uuid: string;
-  name: string;
-  arrivalDate: Date,
-  departureDate:Date,
-  location: any; //Voir comment faire: geohash ou longitude et latitudes
-  illustrations: Photo[]
-}
-
-export interface Reaction {
-    likes: Like[]
-    comments: Comment[]
-}
-
-export class Like {
-    user: User
-}
-
-export class Comment {
-    user: User
-    content: string
-}
-```
+![Diagramme de classe](./docs/deploy-diag.png)
 
 # TODO
 
