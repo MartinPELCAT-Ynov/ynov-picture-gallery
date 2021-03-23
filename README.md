@@ -95,26 +95,13 @@ export class Comment {
 
 # TODO
 
-- **`Inscription`**
-
-  - `input`:
-    - firstName: string
-    - lastName: string
-    - email: string
-    - password: string
-  - Envoyer un mail
-
-- **`Connexion`**
-
-  - `input`:
-    - email: string
-    - password: string
-
-- **`Creation de voyage`**
-
-  - Upload des photos
-  - Preparer un connecteur pour un upload sur un serveur (s3, firebase)
-
 - **`Affichage des photos`**
-  - en liste avec miniatures
+
+  - Afficher une carte dans les voyages
+
+- **`Carousel Photo avec likes et commentaires`**
+
+  - Afficher une carte dans les voyages
+
+- **`Affichage les likes et commentaires des Album et travels`**
   - Afficher une carte dans les voyages

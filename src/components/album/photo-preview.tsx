@@ -3,6 +3,7 @@ import React, { MouseEventHandler, useContext, useRef, useState } from "react";
 import { useClickAway } from "react-use";
 import { AlbumContext } from "src/contexts/album-context";
 import { Photo, useDeleteImagesMutation } from "src/__generated__";
+import { DeleteIcon } from "../icons/DeleteIcon";
 
 export const PhotoPreview = (photo: Photo) => {
   const contextMenuRef = useRef(null);
@@ -46,9 +47,10 @@ export const PhotoPreview = (photo: Photo) => {
       <div
         onClick={handleDeletePhoto}
         role="button"
-        className="hover:bg-gray-100 p-2 rounded-md"
+        className="hover:bg-gray-100 p-2 rounded-md text-red-500 flex space-x-2 items-center"
       >
-        Supprimer
+        <DeleteIcon />
+        <span>Delete</span>
       </div>
     </div>
   );

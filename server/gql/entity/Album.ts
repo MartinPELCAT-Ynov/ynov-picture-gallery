@@ -14,7 +14,7 @@ import { AbstractEntity, User, Photo, Travel } from ".";
 @ObjectType()
 @Entity()
 export class Album {
-  @PrimaryGeneratedColumn("uuid", { name: "uuid" })
+  @PrimaryGeneratedColumn("uuid")
   @Field()
   uuid!: string;
 
