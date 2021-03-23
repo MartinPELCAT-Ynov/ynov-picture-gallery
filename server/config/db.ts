@@ -14,8 +14,8 @@ export const DB_CONFIG: PostgresConnectionOptions = {
   logging: true,
   logger: "file",
   synchronize: true,
-  // dropSchema: true,
-  entities: [join(__dirname, "..", "gql/entity/**/*{.ts,.js}")],
+  dropSchema: true,
+  entities: [join(__dirname, "..", "gql/entity2/**/*{.ts,.js}")],
   migrations: [join(__dirname, "..", "gql/migration/**/*{.ts,.js}")],
   subscribers: [join(__dirname, "..", "gql/subscriber/**/*{.ts,.js}")],
 };
