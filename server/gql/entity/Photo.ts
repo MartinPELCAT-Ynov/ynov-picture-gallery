@@ -1,5 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
-import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, RelationId } from "typeorm";
 import { Lazy } from "../helpers";
 import { ReactionEntity } from "./ReactionEntitiy";
 
@@ -9,6 +9,10 @@ export class Photo {
   @OneToOne(() => ReactionEntity, { lazy: true, primary: true, cascade: true })
   @JoinColumn()
   entity!: Lazy<ReactionEntity>;
+
+  @RelationId((album: Photo) => album.entity)
+  @Field()
+  uuid?: string;
 
   @Field()
   @Column()

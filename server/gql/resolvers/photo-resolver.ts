@@ -1,12 +1,5 @@
 import { StorageService } from "../../services/storage/storage-service";
-import {
-  Arg,
-  Authorized,
-  FieldResolver,
-  Mutation,
-  Resolver,
-  Root,
-} from "type-graphql";
+import { Arg, Authorized, Mutation, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { getConnection, Repository } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
@@ -37,11 +30,5 @@ export class PhotoResolver {
     });
 
     return { success: true };
-  }
-
-  @FieldResolver(() => String)
-  async uuid(@Root() photo: Photo) {
-    console.log(photo);
-    return await photo.entity;
   }
 }

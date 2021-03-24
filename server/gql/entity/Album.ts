@@ -33,7 +33,7 @@ export class Album {
   @Field()
   name!: string;
 
-  @ManyToMany(() => Photo, { cascade: true, lazy: true })
+  @ManyToMany(() => Photo, { lazy: true })
   @JoinTable()
   photos!: Lazy<Photo[]>;
 

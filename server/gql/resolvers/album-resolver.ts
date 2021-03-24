@@ -15,7 +15,7 @@ import {
   UnauthorizedError,
 } from "type-graphql";
 import { Service } from "typedi";
-import { getRepository, Repository } from "typeorm";
+import { getConnection, getRepository, Repository } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { CreateAlbumInput } from "../inputs/album-input";
 import { FileType } from "../scalars/file-scalar";
@@ -94,9 +94,8 @@ export class AlbumResolver {
     const files = await Promise.all(upFiles);
     const album = await this.albumRepository.findOneOrFail({
       where: { entity: albumUuid },
-      relations: ["entity", "photos", "travel"],
+      relations: ["entity"],
     });
-    console.log(album);
 
     if (!album) throw new Error("Album not found");
     const entity = await album.entity;
@@ -111,10 +110,15 @@ export class AlbumResolver {
       entity: ReactionEntity.create({ owner }),
     });
 
-    album.photos = Promise.resolve([staticPhoto]);
-    console.log(album.photos);
+    const photosSaved = await getRepository(Photo).save(staticPhoto);
 
-    return await this.albumRepository.save(album);
+    await getConnection()
+      .createQueryBuilder()
+      .relation(Album, "photos")
+      .of(entity.uuid)
+      .add(photosSaved);
+
+    return album;
   }
 
   @FieldResolver(() => [Photo])
@@ -128,6 +132,8 @@ export class AlbumResolver {
       .where("reactionentity.uuid = :albumUuid", { albumUuid })
       .getOne();
     if (!curentAlbum) throw new Error("Cannot find album: " + album.entity);
+
+    console.log(curentAlbum.photos);
 
     return this.storageService.getPhotos(await curentAlbum.photos);
   }
