@@ -8,8 +8,10 @@ import {
   ManyToOne,
   OneToOne,
 } from "typeorm";
-import { Photo, Travel, ReactionEntity } from ".";
 import { Lazy } from "../helpers";
+import { ReactionEntity } from "./ReactionEntitiy";
+import { Photo } from "./Photo";
+import { Travel } from "./Travel";
 
 @ObjectType()
 @Entity()

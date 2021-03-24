@@ -1,4 +1,3 @@
-import { Photo, ReactionEntity, Travel } from ".";
 import {
   Column,
   Entity,
@@ -10,6 +9,9 @@ import {
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
 import { Lazy } from "../helpers";
+import { ReactionEntity } from "./ReactionEntitiy";
+import { Travel } from "./Travel";
+import { Photo } from "./Photo";
 
 @ObjectType()
 @Entity()

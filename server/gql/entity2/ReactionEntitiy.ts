@@ -5,8 +5,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { User, Comment, Like } from ".";
 import { Lazy } from "../helpers";
+import { Comment } from "./Comment";
+import { Like } from "./Like";
+import { User } from "./User";
 
 @Entity()
 export class ReactionEntity extends BaseEntity {
@@ -20,5 +22,5 @@ export class ReactionEntity extends BaseEntity {
   comments!: Lazy<Comment[]>;
 
   @ManyToOne(() => User, { lazy: true })
-  user!: Lazy<User>;
+  owner!: Lazy<User>;
 }

@@ -1,7 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { Lazy } from "../helpers";
-import { Travel } from ".";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity()
 @ObjectType()
@@ -27,8 +25,4 @@ export class User {
 
   @Column("boolean", { default: false })
   isActivated!: boolean;
-
-  @OneToMany(() => Travel, (travel) => travel.user, { lazy: true })
-  @Field(() => [Travel])
-  travels!: Lazy<Travel[]>;
 }

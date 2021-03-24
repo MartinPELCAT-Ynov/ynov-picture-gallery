@@ -1,6 +1,7 @@
 import { Entity, ManyToOne } from "typeorm";
 import { Lazy } from "../helpers";
-import { ReactionEntity, User } from ".";
+import { ReactionEntity } from "./ReactionEntitiy";
+import { User } from "./User";
 
 @Entity()
 export class Like {

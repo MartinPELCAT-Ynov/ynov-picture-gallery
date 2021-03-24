@@ -1,6 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { ReactionEntity, User } from ".";
 import { Lazy } from "../helpers";
+import { ReactionEntity } from "./ReactionEntitiy";
+import { User } from "./User";
 
 @Entity()
 export class Comment {
