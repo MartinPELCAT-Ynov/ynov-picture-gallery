@@ -13,24 +13,37 @@ import {
 import { Service } from "typedi";
 import { Repository } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { AbstractEntity, Album, Travel, User } from "../entity";
+import { Album } from "../entity/Album";
+import { Comment } from "../entity/Comment";
+import { Like } from "../entity/Like";
+import {
+  ReactionEntitiyResolver,
+  ReactionEntity,
+} from "../entity/ReactionEntitiy";
+import { Travel } from "../entity/Travel";
+import { User } from "../entity/User";
 import { CreateTravelInput } from "../inputs/travel-input";
 
 @Resolver(() => Travel)
 @Service()
-export class TravelResolver {
+export class TravelResolver implements ReactionEntitiyResolver {
   constructor(
     @InjectRepository(Travel)
     private readonly travelRepository: Repository<Travel>,
     @InjectRepository(Album)
-    private readonly albumRepository: Repository<Album>
+    private readonly albumRepository: Repository<Travel>
   ) {}
 
   @Query(() => [Travel])
   @Authorized()
   async myTravels(@Ctx() { session }: KoaContext) {
-    const sessionUser = session!.user as User;
-    return this.travelRepository.find({ where: { user: sessionUser.uuid } });
+    const user = session!.user as User;
+    const travels = this.travelRepository
+      .createQueryBuilder("travel")
+      .leftJoin("travel.entity", "reactionentity")
+      .where("reactionentity.owner = :userUuid", { userUuid: user.uuid })
+      .getMany();
+    return travels;
   }
 
   @Mutation(() => Travel, { nullable: true })
@@ -40,46 +53,47 @@ export class TravelResolver {
     @Ctx() { session }: KoaContext
   ) {
     const user: User = session!.user;
+
     const travel = this.travelRepository.create({
-      name,
+      albums: [],
       description,
-      user: user,
-      entity: AbstractEntity.create(),
+      name,
+      entity: ReactionEntity.create({ owner: user }),
     });
-    return await this.travelRepository.save(travel);
+    return this.travelRepository.save(travel);
   }
 
   @Query(() => Travel)
   async getTravel(@Arg("id") id: string) {
-    return this.travelRepository.findOne(id);
+    const travel = await this.travelRepository
+      .createQueryBuilder("travel")
+      .leftJoinAndSelect("travel.entity", "reactionentity")
+      .where("reactionentity.uuid = :id", { id })
+      .getOneOrFail();
+    return travel;
+  }
+
+  @FieldResolver(() => [Like])
+  async likes(@Root() travel: Travel): Promise<Like[]> {
+    const entity = await travel.entity;
+    return entity.likes;
+  }
+  comments(): Promise<Comment[]> {
+    throw new Error("Method not implemented.");
+  }
+  owner(): Promise<User> {
+    throw new Error("Method not implemented.");
+  }
+  @FieldResolver(() => Int)
+  async albumsCount(@Root() travel: Travel) {
+    const count = await this.albumRepository.count({
+      where: { travel: travel.uuid },
+    });
+    return count;
   }
 
   @FieldResolver(() => Int)
   async likeCounts() {
     return 9;
-  }
-
-  @FieldResolver(() => [Album])
-  async albums(@Root() travel: Travel, @Ctx() { session }: KoaContext) {
-    const sessionUser = session?.user as User | null;
-    return !sessionUser || sessionUser.uuid !== travel.userId
-      ? this.albumRepository.find({
-          where: { travel, isPublic: true },
-        })
-      : this.albumRepository.find({
-          where: { travel },
-        });
-  }
-
-  @FieldResolver(() => Int)
-  async albumsCount(@Root() travel: Travel, @Ctx() { session }: KoaContext) {
-    const sessionUser = session?.user as User | null;
-    return !sessionUser || sessionUser.uuid !== travel.userId
-      ? this.albumRepository.count({
-          where: { travel, isPublic: true },
-        })
-      : this.albumRepository.count({
-          where: { travel },
-        });
   }
 }

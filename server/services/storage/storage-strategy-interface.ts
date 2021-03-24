@@ -1,11 +1,13 @@
-import { Photo } from "server/gql/entity";
+import { Photo } from "server/gql/entity/Photo";
 import { FileType } from "server/gql/scalars/file-scalar";
 import { FirebaseStorageStrategy } from "./strategies/firebase/firebase-strategy";
 import { LocalStorageStrategy } from "./strategies/local-strategy";
 import { S3StorageStrategy } from "./strategies/s3-strategy";
 
+export type CreatePhoto = Pick<Photo, "name" | "provider" | "url">;
+
 export interface IStorageStrategy {
-  uploadPhotos(files: FileType[]): Promise<Photo[]>;
+  uploadPhotos(files: FileType[]): Promise<CreatePhoto[]>;
   getPhotos(photos: Photo[]): Promise<Photo[]>;
   deletePhotos(fileNames: string[]): Promise<void>;
 }

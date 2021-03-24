@@ -2,21 +2,28 @@ import { Field, ObjectType } from "type-graphql";
 import {
   Column,
   Entity,
-  getRepository,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  OneToOne,
   RelationId,
 } from "typeorm";
-import { AbstractEntity, User, Photo, Travel } from ".";
+import { Lazy } from "../helpers";
+import { ReactionEntity } from "./ReactionEntitiy";
+import { Photo } from "./Photo";
+import { Travel } from "./Travel";
 
 @ObjectType()
 @Entity()
 export class Album {
-  @PrimaryGeneratedColumn("uuid")
+  @OneToOne(() => ReactionEntity, { lazy: true, primary: true, cascade: true })
+  @JoinColumn()
+  entity!: Lazy<ReactionEntity>;
+
+  @RelationId((album: Album) => album.entity)
   @Field()
-  uuid!: string;
+  uuid?: string;
 
   @Column("boolean", { default: false })
   @Field()
@@ -26,22 +33,12 @@ export class Album {
   @Field()
   name!: string;
 
-  @ManyToMany(() => Photo, { cascade: true })
+  @ManyToMany(() => Photo, { lazy: true })
   @JoinTable()
-  photos!: Photo[];
+  photos!: Lazy<Photo[]>;
 
-  @ManyToOne(() => AbstractEntity, { nullable: false })
-  travel!: AbstractEntity;
-
-  @RelationId((album: Album) => album.travel)
-  travelId!: string;
-
-  public async getOwner(): Promise<User> {
-    const travel = await getRepository(Travel).findOne({
-      where: { entity: this.travelId },
-      relations: ["user"],
-    });
-    if (!travel) throw new Error("Faild to fetch user");
-    return travel.user;
-  }
+  // relation
+  @ManyToOne(() => Travel, { lazy: true })
+  @Field(() => [Travel])
+  travel!: Lazy<Travel>;
 }

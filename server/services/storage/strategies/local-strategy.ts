@@ -1,4 +1,4 @@
-import { Photo } from "server/gql/entity";
+import { Photo } from "server/gql/entity/Photo";
 import { FileType } from "server/gql/scalars/file-scalar";
 import { StorageStrategy } from "./storage-strategy";
 

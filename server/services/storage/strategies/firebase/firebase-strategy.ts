@@ -1,4 +1,4 @@
-import { Photo } from "server/gql/entity";
+import { Photo } from "server/gql/entity/Photo";
 import { FileType } from "server/gql/scalars/file-scalar";
 import * as admin from "firebase-admin";
 import { StorageStrategy } from "../storage-strategy";
@@ -6,6 +6,7 @@ import { v4 } from "uuid";
 
 //Fichier generer depuis la console firebase
 import * as serviceAccount from "./firebase.json";
+import { CreatePhoto } from "../../storage-strategy-interface";
 
 export class FirebaseStorageStrategy extends StorageStrategy {
   private storage: admin.storage.Storage;
@@ -24,8 +25,8 @@ export class FirebaseStorageStrategy extends StorageStrategy {
     return this.storage.bucket();
   }
 
-  async uploadPhotos(files: FileType[]): Promise<Photo[]> {
-    const photos: Photo[] = [];
+  async uploadPhotos(files: FileType[]): Promise<CreatePhoto[]> {
+    const photos: CreatePhoto[] = [];
     for (const file of files) {
       const token = v4();
       const fileName = `${token}-${file.filename}`;
@@ -38,7 +39,7 @@ export class FirebaseStorageStrategy extends StorageStrategy {
 
       this.deleteTmpFile(fileName);
 
-      photos.push({ name: file.filename, url: fileName });
+      photos.push({ name: file.filename, url: fileName, provider: "firebase" });
     }
 
     return photos;

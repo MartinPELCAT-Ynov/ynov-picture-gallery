@@ -1,9 +1,9 @@
-import { User } from "../entity/User";
 import { FieldResolver, Query, Resolver, Root } from "type-graphql";
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { Repository } from "typeorm";
-import { Travel } from "../entity";
+import { User } from "../entity/User";
+import { Travel } from "../entity/Travel";
 
 @Service()
 @Resolver(() => User)
@@ -14,16 +14,19 @@ export class UserResolver {
     private readonly travelRepository: Repository<Travel>
   ) {}
 
-  @Query(() => [User], { nullable: true })
+  @Query(() => [User])
   async users(): Promise<User[]> {
-    return this.userRepository.find();
+    const users = this.userRepository.find();
+    return users;
   }
 
   @FieldResolver(() => [Travel])
   async travels(@Root() user: User) {
-    const travels = await this.travelRepository.find({
-      where: { user },
-    });
+    const travels = await this.travelRepository
+      .createQueryBuilder("travel")
+      .leftJoinAndSelect("travel.entity", "reactionentity")
+      .where("reactionentity.owner = :userUuid", { userUuid: user.uuid })
+      .getMany();
     return travels;
   }
 }

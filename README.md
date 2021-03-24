@@ -44,6 +44,10 @@ Enfin, une autre évolution du projet serait l’ajout d’un système de«likes
 
 ![Diagramme de classe](./docs/deploy-diag.png)
 
+# Base de données
+
+![Diagramme de classe](./docs/erd.png)
+
 # TODO
 
 - **`Affichage des photos`**

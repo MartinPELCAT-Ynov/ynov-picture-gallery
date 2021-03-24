@@ -3,7 +3,7 @@ import { Arg, Authorized, Mutation, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { getConnection, Repository } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { Photo } from "../entity";
+import { Photo } from "../entity/Photo";
 import { SucessObject } from "../inputs/sucess-object";
 
 @Service()
@@ -21,8 +21,12 @@ export class PhotoResolver {
   ): Promise<SucessObject> {
     const photos = await this.photoRepository
       .createQueryBuilder("photo")
-      .where("photo.uuid IN (:...photoIds)", { photoIds })
+      .leftJoin("photo.entity", "relationentity")
+      .where("relationentity.uuid IN (:...photoIds)", { photoIds })
       .getMany();
+
+    console.log(photos);
+    return { success: true };
 
     await getConnection().transaction(async (manager) => {
       await manager.remove(photos);

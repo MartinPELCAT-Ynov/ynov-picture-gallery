@@ -1,5 +1,4 @@
 import { join } from "path";
-// import { User } from "../../server/entity/User";
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
 
 require("dotenv").config();
