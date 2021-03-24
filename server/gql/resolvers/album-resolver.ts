@@ -33,6 +33,8 @@ export class AlbumResolver {
     private readonly albumRepository: Repository<Album>,
     @InjectRepository(Travel)
     private readonly travelRepository: Repository<Travel>,
+    @InjectRepository(Photo)
+    private readonly photoRepository: Repository<Photo>,
     private readonly storageService: StorageService
   ) {}
 
@@ -105,12 +107,14 @@ export class AlbumResolver {
 
     const photos = await this.storageService.uploadPhotos(files);
 
-    const staticPhoto = getRepository(Photo).create({
-      ...photos[0],
-      entity: ReactionEntity.create({ owner }),
+    const allPhotos = photos.map((photo) => {
+      return this.photoRepository.create({
+        ...photo,
+        entity: ReactionEntity.create({ owner }),
+      });
     });
 
-    const photosSaved = await getRepository(Photo).save(staticPhoto);
+    const photosSaved = await getRepository(Photo).save(allPhotos);
 
     await getConnection()
       .createQueryBuilder()
@@ -132,8 +136,6 @@ export class AlbumResolver {
       .where("reactionentity.uuid = :albumUuid", { albumUuid })
       .getOne();
     if (!curentAlbum) throw new Error("Cannot find album: " + album.entity);
-
-    console.log(curentAlbum.photos);
 
     return this.storageService.getPhotos(await curentAlbum.photos);
   }
