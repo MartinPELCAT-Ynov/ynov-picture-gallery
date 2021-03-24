@@ -1,19 +1,29 @@
-import { Photo, Travel } from ".";
 import {
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  OneToOne,
+  RelationId,
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
+import { Lazy } from "../helpers";
+import { Travel } from "./Travel";
+import { ReactionEntity } from "./ReactionEntitiy";
+import { Photo } from "./Photo";
 
 @ObjectType()
 @Entity()
 export class Destination {
-  @PrimaryGeneratedColumn("uuid")
-  uuid!: string;
+  @OneToOne(() => ReactionEntity, { lazy: true, primary: true, cascade: true })
+  @JoinColumn()
+  entity!: Lazy<ReactionEntity>;
+
+  @RelationId((dest: Destination) => dest.entity)
+  @Field()
+  uuid?: string;
 
   @Column()
   @Field()
@@ -23,17 +33,18 @@ export class Destination {
   @Field()
   arrivalDate!: Date;
 
-  @Column("time with time zone")
+  @Column("timestamp with time zone")
   @Field()
   departureDate!: Date;
 
   location: any; //Voir comment faire: geohash ou longitude et latitudes
 
-  @ManyToMany(() => Photo)
+  @ManyToOne(() => Travel, { lazy: true })
+  @Field(() => Travel)
+  travel!: Lazy<Travel>;
+
+  @ManyToMany(() => Photo, { cascade: true, lazy: true })
   @JoinTable()
   @Field(() => [Photo])
-  illustrations!: Photo[];
-
-  @ManyToOne(() => Travel, (trvl) => trvl.destinations)
-  travel!: Travel;
+  illu!: Lazy<Photo[]>;
 }

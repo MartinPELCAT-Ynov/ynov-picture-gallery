@@ -15,11 +15,15 @@ import {
   UnauthorizedError,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Repository } from "typeorm";
+import { getRepository, Repository } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { Album, Photo, Travel, User } from "../entity";
 import { CreateAlbumInput } from "../inputs/album-input";
 import { FileType } from "../scalars/file-scalar";
+import { Album } from "../entity/Album";
+import { Travel } from "../entity/Travel";
+import { User } from "../entity/User";
+import { Photo } from "../entity/Photo";
+import { ReactionEntity } from "../entity/ReactionEntitiy";
 
 @Service()
 @Resolver(() => Album)
@@ -38,19 +42,41 @@ export class AlbumResolver {
     @Arg("input") { name, travelId }: CreateAlbumInput,
     @Ctx() { session }: KoaContext
   ) {
-    const travel = await this.travelRepository.findOne(travelId);
-    const userSession = session!.user as User;
-    if (travel?.userId !== userSession.uuid) throw new ForbiddenError();
-    const album = this.albumRepository.create({ name, travel });
+    const travel = await this.travelRepository
+      .createQueryBuilder("travel")
+      .leftJoinAndSelect("travel.entity", "reactionentity")
+      .andWhere("travel.entity = :travelId", { travelId })
+      .getOne();
+
+    if (!travel) throw new Error("Travel not found");
+
+    const entity = await travel.entity;
+    const owner = await entity.owner;
+    const user = session!.user as User;
+
+    if (owner.uuid !== user.uuid) throw new ForbiddenError();
+
+    const album = this.albumRepository.create({
+      name,
+      travel: entity.uuid as any,
+      isPublic: false,
+      photos: [],
+      entity: ReactionEntity.create({ owner }),
+    });
     return this.albumRepository.save(album);
   }
 
   @Query(() => Album)
   async album(@Arg("id") uuid: string, @Ctx() { session }: KoaContext) {
-    const album = await this.albumRepository.findOne({ where: { uuid } });
+    const album = await this.albumRepository.findOneOrFail({
+      where: { entity: uuid },
+      relations: ["entity"],
+    });
+
     if (!album) throw new Error("Album does not exist");
     const sessionUser = session?.user as User | null;
-    const user = await album.getOwner();
+    const entiy = await album.entity;
+    const user = await entiy.owner;
     const isPublic = album.isPublic;
     if (!isPublic && sessionUser?.uuid !== user.uuid) {
       throw new UnauthorizedError();
@@ -66,25 +92,44 @@ export class AlbumResolver {
     @Ctx() { session }: KoaContext
   ) {
     const files = await Promise.all(upFiles);
-    const album = await this.albumRepository.findOne(albumUuid);
+    const album = await this.albumRepository.findOneOrFail({
+      where: { entity: albumUuid },
+      relations: ["entity", "photos", "travel"],
+    });
+    console.log(album);
+
     if (!album) throw new Error("Album not found");
-    if ((await album.getOwner()).uuid !== session?.user.uuid) {
-      throw new UnauthorizedError();
-    }
+    const entity = await album.entity;
+    const owner = await entity.owner;
+
+    if (owner.uuid !== session?.user.uuid) throw new UnauthorizedError();
+
     const photos = await this.storageService.uploadPhotos(files);
-    album.photos = [...(album.photos || []), ...photos];
+
+    const staticPhoto = getRepository(Photo).create({
+      ...photos[0],
+      entity: ReactionEntity.create({ owner }),
+    });
+
+    album.photos = Promise.resolve([staticPhoto]);
+    console.log(album.photos);
+
     return await this.albumRepository.save(album);
   }
 
   @FieldResolver(() => [Photo])
   async photos(@Root() album: Album): Promise<Photo[]> {
-    const curentAlbum = await this.albumRepository.findOne({
-      where: { uuid: album.uuid },
-      relations: ["photos"],
-    });
-    if (!curentAlbum) throw new Error("Cannot find album: " + album.uuid);
+    const albumUuid = album.uuid;
 
-    return this.storageService.getPhotos(curentAlbum.photos);
+    const curentAlbum = await this.albumRepository
+      .createQueryBuilder("album")
+      .leftJoinAndSelect("album.photos", "photo")
+      .leftJoin("album.entity", "reactionentity")
+      .where("reactionentity.uuid = :albumUuid", { albumUuid })
+      .getOne();
+    if (!curentAlbum) throw new Error("Cannot find album: " + album.entity);
+
+    return this.storageService.getPhotos(await curentAlbum.photos);
   }
 
   @FieldResolver(() => Int)
@@ -92,15 +137,21 @@ export class AlbumResolver {
     const curentAlbum = await this.albumRepository
       .createQueryBuilder("album")
       .loadRelationCountAndMap("album.photos", "album.photos")
-      .where("album.uuid = :uuid", { uuid: album.uuid })
-      .getOne();
+      .leftJoin("album.entity", "reactionentity")
+      .where("reactionentity.uuid = :albumUuid", { albumUuid: album.uuid })
+      .getOneOrFail();
 
-    if (!curentAlbum) throw new Error("Cannot find album: " + album.uuid);
+    if (!curentAlbum) throw new Error("Cannot find album: " + album.entity);
     return curentAlbum.photos;
   }
 
   @FieldResolver(() => User)
   async owner(@Root() album: Album) {
-    return album.getOwner();
+    const curentAlbum = await this.albumRepository.findOneOrFail(album.uuid, {
+      relations: ["entity"],
+    });
+
+    const owner = await (await curentAlbum.entity).owner;
+    return owner;
   }
 }

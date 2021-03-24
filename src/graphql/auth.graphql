@@ -32,7 +32,6 @@ fragment userFields on User {
   uuid
   firstName
   lastName
-  email
 }
 
 mutation Logout {

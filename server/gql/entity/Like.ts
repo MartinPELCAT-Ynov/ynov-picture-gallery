@@ -1,19 +1,16 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Field, ObjectType } from "type-graphql";
+import { Entity, ManyToOne } from "typeorm";
 import { Lazy } from "../helpers";
 import { ReactionEntity } from "./ReactionEntitiy";
 import { User } from "./User";
 
 @Entity()
-export class Comment {
-  @PrimaryGeneratedColumn("uuid")
-  uuid!: string;
-
+@ObjectType()
+export class Like {
   @ManyToOne(() => ReactionEntity, { lazy: true, primary: true })
   entity!: Lazy<ReactionEntity>;
 
-  @ManyToOne(() => User, { lazy: true })
+  @ManyToOne(() => User, { lazy: true, primary: true })
+  @Field(() => User)
   user!: Lazy<User>;
-
-  @Column()
-  content!: string;
 }

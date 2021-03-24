@@ -25,7 +25,7 @@ export type Query = {
   me: User;
   myTravels: Array<Travel>;
   getTravel: Travel;
-  users?: Maybe<Array<User>>;
+  users: Array<User>;
 };
 
 export type QueryAlbumArgs = {
@@ -41,25 +41,10 @@ export type Album = {
   uuid: Scalars["String"];
   isPublic: Scalars["Boolean"];
   name: Scalars["String"];
+  travel: Array<Travel>;
   photos: Array<Photo>;
   photoCount: Scalars["Int"];
   owner: User;
-};
-
-export type Photo = {
-  __typename?: "Photo";
-  uuid: Scalars["String"];
-  name: Scalars["String"];
-  url: Scalars["String"];
-};
-
-export type User = {
-  __typename?: "User";
-  uuid: Scalars["String"];
-  firstName: Scalars["String"];
-  lastName: Scalars["String"];
-  email: Scalars["String"];
-  travels: Array<Travel>;
 };
 
 export type Travel = {
@@ -67,9 +52,30 @@ export type Travel = {
   uuid: Scalars["String"];
   name: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
-  likeCounts: Scalars["Int"];
   albums: Array<Album>;
+  likes: Array<Like>;
   albumsCount: Scalars["Int"];
+  likeCounts: Scalars["Int"];
+};
+
+export type Like = {
+  __typename?: "Like";
+  user: User;
+};
+
+export type User = {
+  __typename?: "User";
+  uuid: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  travels: Array<Travel>;
+};
+
+export type Photo = {
+  __typename?: "Photo";
+  name: Scalars["String"];
+  url: Scalars["String"];
+  uuid: Scalars["String"];
 };
 
 export type Mutation = {
@@ -211,7 +217,7 @@ export type RegisterMutation = { __typename?: "Mutation" } & {
 
 export type UserFieldsFragment = { __typename?: "User" } & Pick<
   User,
-  "uuid" | "firstName" | "lastName" | "email"
+  "uuid" | "firstName" | "lastName"
 >;
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
@@ -283,7 +289,6 @@ export const UserFieldsFragmentDoc = gql`
     uuid
     firstName
     lastName
-    email
   }
 `;
 export const PreviewTravelFragmentDoc = gql`

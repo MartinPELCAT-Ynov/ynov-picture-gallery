@@ -1,4 +1,4 @@
-import { Photo } from "../../gql/entity";
+import { Photo } from "../../gql/entity/Photo";
 import { FileType } from "server/gql/scalars/file-scalar";
 import { Service } from "typedi";
 import {

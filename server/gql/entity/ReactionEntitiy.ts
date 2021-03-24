@@ -24,3 +24,9 @@ export class ReactionEntity extends BaseEntity {
   @ManyToOne(() => User, { lazy: true })
   owner!: Lazy<User>;
 }
+
+export interface ReactionEntitiyResolver {
+  likes(...args: any): Promise<Like[]>;
+  comments(...args: any): Promise<Comment[]>;
+  owner(...args: any): Promise<User>;
+}

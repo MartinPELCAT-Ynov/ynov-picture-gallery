@@ -50,8 +50,8 @@ export class AuthResolver {
     @Ctx() req: KoaContext
   ): Promise<SucessObject> {
     args.password = await hashPassword(args.password);
-    const user = this.userRepository.create(args);
-    await this.userRepository.save(user);
+    const userCreate = this.userRepository.create(args);
+    const user = await this.userRepository.save(userCreate);
     await this.emailService.sendRegisterConfirmation(user, req.origin);
     return { success: true };
   }

@@ -1,5 +1,5 @@
 import { Field, InputType } from "type-graphql";
-import { Album } from "../entity";
+import { Album } from "../entity/Album";
 
 @InputType()
 export class CreateAlbumInput implements Partial<Album> {

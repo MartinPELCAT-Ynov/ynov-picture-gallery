@@ -1,25 +1,26 @@
-import { Destination, User, AbstractEntity, Album } from ".";
 import { Field, ObjectType } from "type-graphql";
 import {
   Column,
   Entity,
   JoinColumn,
-  ManyToOne,
   OneToMany,
   OneToOne,
   RelationId,
 } from "typeorm";
+import { Lazy } from "../helpers";
+import { Album } from "./Album";
+import { ReactionEntity } from "./ReactionEntitiy";
 
 @ObjectType()
 @Entity()
 export class Travel {
-  @OneToOne(() => AbstractEntity, { primary: true, cascade: true })
+  @OneToOne(() => ReactionEntity, { lazy: true, primary: true, cascade: true })
   @JoinColumn()
-  entity!: AbstractEntity;
+  entity!: Lazy<ReactionEntity>;
 
-  @RelationId((travel: Travel) => travel.entity)
+  @RelationId((trv: Travel) => trv.entity)
   @Field()
-  uuid!: string;
+  uuid?: string;
 
   @Column()
   @Field()
@@ -29,17 +30,7 @@ export class Travel {
   @Field({ nullable: true })
   description!: string;
 
-  @OneToMany(() => Destination, (destination) => destination.travel)
-  destinations!: Destination[];
-
-  @OneToMany(() => Album, (album) => album.travel)
-  album!: Album;
-
-  @ManyToOne(() => User, {
-    nullable: false,
-  })
-  user!: User;
-
-  @RelationId((travel: Travel) => travel.user)
-  userId!: string;
+  @OneToMany(() => Album, (album) => album.travel, { lazy: true })
+  @Field(() => [Album])
+  albums!: Lazy<Album[]>;
 }

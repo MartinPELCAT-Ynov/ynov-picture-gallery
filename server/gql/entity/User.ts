@@ -1,13 +1,12 @@
 import { Field, ObjectType } from "type-graphql";
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { Travel } from "./Travel";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity()
 @ObjectType()
 export class User {
   @PrimaryGeneratedColumn("uuid")
   @Field()
-  uuid!: string;
+  readonly uuid!: string;
 
   @Column()
   @Field()
@@ -18,7 +17,6 @@ export class User {
   lastName?: string;
 
   @Column({ unique: true })
-  @Field()
   email!: string;
 
   @Column()
@@ -26,7 +24,4 @@ export class User {
 
   @Column("boolean", { default: false })
   isActivated!: boolean;
-
-  @OneToMany(() => Travel, (travel) => travel.user)
-  travels!: Travel[];
 }

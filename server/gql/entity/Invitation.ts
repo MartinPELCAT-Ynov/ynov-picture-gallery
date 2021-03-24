@@ -9,11 +9,11 @@ export class Invitation {
   @ManyToOne(() => Album, {
     lazy: true,
     primary: true,
-    cascade: true,
   })
+  @Field(() => Album)
   album!: Lazy<Album>;
 
-  @Field()
   @Column({ primary: true })
+  @Field()
   email!: string;
 }
