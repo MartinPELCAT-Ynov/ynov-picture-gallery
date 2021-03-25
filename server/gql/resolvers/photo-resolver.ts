@@ -21,15 +21,16 @@ export class PhotoResolver {
   ): Promise<SucessObject> {
     const photos = await this.photoRepository
       .createQueryBuilder("photo")
-      .leftJoin("photo.entity", "relationentity")
+      .leftJoinAndSelect("photo.entity", "relationentity")
       .where("relationentity.uuid IN (:...photoIds)", { photoIds })
       .getMany();
 
-    console.log(photos);
-    return { success: true };
-
     await getConnection().transaction(async (manager) => {
-      await manager.remove(photos);
+      const deletePhotos = photos.map(async (photo) => {
+        return manager.remove(await photo.entity);
+      });
+
+      await Promise.all(deletePhotos);
       await this.storageService.deletePhotos(photos);
     });
 

@@ -37,7 +37,9 @@ export class Destination {
   @Field()
   departureDate!: Date;
 
-  location: any; //Voir comment faire: geohash ou longitude et latitudes
+  @Column()
+  @Field()
+  geohash!: string; //Voir comment faire: geohash ou longitude et latitudes
 
   @ManyToOne(() => Travel, { lazy: true })
   @Field(() => Travel)

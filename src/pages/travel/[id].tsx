@@ -16,6 +16,10 @@ import { CreateAlbumModal } from "src/modals/create-album-modal";
 
 export default function Travel() {
   const { show, content } = useModal(<CreateAlbumModal />);
+  const {
+    show: showDestinationModal,
+    content: contentDestinationModal,
+  } = useModal(<CreateAlbumModal />);
   return (
     <Layout>
       <TravelContextProvider>
@@ -29,10 +33,17 @@ export default function Travel() {
                       <PreviouIcon />
                       <span className="italic font-medium">{travel?.name}</span>
                     </span>
-                    <Button.Create label="Create album" onClick={show} />
+                    <div className="flex space-x-4">
+                      <Button.Create
+                        label="Ajouter une destination"
+                        onClick={showDestinationModal}
+                      />
+                      <Button.Create label="Create album" onClick={show} />
+                    </div>
                   </div>
                   <AlbumsView />
                 </div>
+                <Modal content={contentDestinationModal} />
                 <Modal content={content} />
               </>
             )}

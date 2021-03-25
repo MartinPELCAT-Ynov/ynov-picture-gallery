@@ -11,10 +11,11 @@ import {
   Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Repository } from "typeorm";
+import { getRepository, Repository } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { Album } from "../entity/Album";
 import { Comment } from "../entity/Comment";
+import { Destination } from "../entity/Destination";
 import { Like } from "../entity/Like";
 import {
   ReactionEntitiyResolver,
@@ -22,6 +23,7 @@ import {
 } from "../entity/ReactionEntitiy";
 import { Travel } from "../entity/Travel";
 import { User } from "../entity/User";
+import { CreateDestinationInput } from "../inputs/destination-input";
 import { CreateTravelInput } from "../inputs/travel-input";
 
 @Resolver(() => Travel)
@@ -31,7 +33,9 @@ export class TravelResolver implements ReactionEntitiyResolver {
     @InjectRepository(Travel)
     private readonly travelRepository: Repository<Travel>,
     @InjectRepository(Album)
-    private readonly albumRepository: Repository<Travel>
+    private readonly albumRepository: Repository<Travel>,
+    @InjectRepository(Destination)
+    private readonly destinationRepository: Repository<Destination>
   ) {}
 
   @Query(() => [Travel])
@@ -73,6 +77,27 @@ export class TravelResolver implements ReactionEntitiyResolver {
     return travel;
   }
 
+  @Mutation(() => Destination)
+  @Authorized()
+  async createDestination(
+    @Arg("travelId") travelId: string,
+    @Arg("dest") destination: CreateDestinationInput,
+    @Ctx() { session }: KoaContext
+  ) {
+    const owner = session!.user as User;
+    const newDestination = this.destinationRepository.create({
+      entity: ReactionEntity.create({ owner }),
+      arrivalDate: destination.arrivalDate,
+      departureDate: destination.departureDate,
+      geohash: destination.geohash,
+      name: destination.name,
+      travel: (travelId as unknown) as Travel,
+      illu: [],
+    });
+
+    return this.destinationRepository.save(newDestination);
+  }
+
   @FieldResolver(() => [Like])
   async likes(@Root() travel: Travel): Promise<Like[]> {
     const entity = await travel.entity;
@@ -90,6 +115,13 @@ export class TravelResolver implements ReactionEntitiyResolver {
       where: { travel: travel.uuid },
     });
     return count;
+  }
+
+  @FieldResolver(() => [Destination])
+  async destinations(@Root() destination: Destination) {
+    const destRepo = getRepository(Destination);
+    const dests = destRepo.find({ where: { travel: destination.uuid } });
+    return dests;
   }
 
   @FieldResolver(() => Int)
