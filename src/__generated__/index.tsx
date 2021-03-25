@@ -15,6 +15,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
+  DateTime: any;
   /** The `Upload` scalar type represents a file upload. */
   Upload: any;
 };
@@ -55,6 +57,7 @@ export type Travel = {
   albums: Array<Album>;
   likes: Array<Like>;
   albumsCount: Scalars["Int"];
+  destinations: Array<Destination>;
   likeCounts: Scalars["Int"];
 };
 
@@ -71,11 +74,22 @@ export type User = {
   travels: Array<Travel>;
 };
 
+export type Destination = {
+  __typename?: "Destination";
+  uuid: Scalars["String"];
+  name: Scalars["String"];
+  arrivalDate: Scalars["DateTime"];
+  departureDate: Scalars["DateTime"];
+  geohash: Scalars["String"];
+  travel: Travel;
+  illu: Array<Photo>;
+};
+
 export type Photo = {
   __typename?: "Photo";
+  uuid: Scalars["String"];
   name: Scalars["String"];
   url: Scalars["String"];
-  uuid: Scalars["String"];
 };
 
 export type Mutation = {
@@ -88,6 +102,7 @@ export type Mutation = {
   validateEmail: SucessObject;
   deletePhotos: SucessObject;
   createTravel?: Maybe<Travel>;
+  createDestination: Destination;
 };
 
 export type MutationCreateAlbumArgs = {
@@ -119,6 +134,11 @@ export type MutationCreateTravelArgs = {
   input: CreateTravelInput;
 };
 
+export type MutationCreateDestinationArgs = {
+  dest: CreateDestinationInput;
+  travelId: Scalars["String"];
+};
+
 export type CreateAlbumInput = {
   travelId: Scalars["String"];
   name: Scalars["String"];
@@ -144,6 +164,13 @@ export type RegisterInput = {
 export type CreateTravelInput = {
   name: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
+};
+
+export type CreateDestinationInput = {
+  arrivalDate: Scalars["DateTime"];
+  departureDate: Scalars["DateTime"];
+  geohash: Scalars["String"];
+  name: Scalars["String"];
 };
 
 export type CreateAlbumMutationVariables = Exact<{
@@ -234,6 +261,21 @@ export type ValidateEmailMutation = { __typename?: "Mutation" } & {
   validateEmail: { __typename?: "SucessObject" } & Pick<
     SucessObject,
     "success"
+  >;
+};
+
+export type CreateDestinationMutationVariables = Exact<{
+  traveld: Scalars["String"];
+  arrivalDate: Scalars["DateTime"];
+  departureDate: Scalars["DateTime"];
+  geohash: Scalars["String"];
+  name: Scalars["String"];
+}>;
+
+export type CreateDestinationMutation = { __typename?: "Mutation" } & {
+  createDestination: { __typename?: "Destination" } & Pick<
+    Destination,
+    "uuid" | "geohash" | "arrivalDate" | "departureDate" | "name"
   >;
 };
 
@@ -707,6 +749,76 @@ export type ValidateEmailMutationResult = Apollo.MutationResult<ValidateEmailMut
 export type ValidateEmailMutationOptions = Apollo.BaseMutationOptions<
   ValidateEmailMutation,
   ValidateEmailMutationVariables
+>;
+export const CreateDestinationDocument = gql`
+  mutation createDestination(
+    $traveld: String!
+    $arrivalDate: DateTime!
+    $departureDate: DateTime!
+    $geohash: String!
+    $name: String!
+  ) {
+    createDestination(
+      travelId: $traveld
+      dest: {
+        arrivalDate: $arrivalDate
+        departureDate: $departureDate
+        geohash: $geohash
+        name: $name
+      }
+    ) {
+      uuid
+      geohash
+      arrivalDate
+      departureDate
+      name
+    }
+  }
+`;
+export type CreateDestinationMutationFn = Apollo.MutationFunction<
+  CreateDestinationMutation,
+  CreateDestinationMutationVariables
+>;
+
+/**
+ * __useCreateDestinationMutation__
+ *
+ * To run a mutation, you first call `useCreateDestinationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDestinationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDestinationMutation, { data, loading, error }] = useCreateDestinationMutation({
+ *   variables: {
+ *      traveld: // value for 'traveld'
+ *      arrivalDate: // value for 'arrivalDate'
+ *      departureDate: // value for 'departureDate'
+ *      geohash: // value for 'geohash'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useCreateDestinationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateDestinationMutation,
+    CreateDestinationMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    CreateDestinationMutation,
+    CreateDestinationMutationVariables
+  >(CreateDestinationDocument, baseOptions);
+}
+export type CreateDestinationMutationHookResult = ReturnType<
+  typeof useCreateDestinationMutation
+>;
+export type CreateDestinationMutationResult = Apollo.MutationResult<CreateDestinationMutation>;
+export type CreateDestinationMutationOptions = Apollo.BaseMutationOptions<
+  CreateDestinationMutation,
+  CreateDestinationMutationVariables
 >;
 export const DeleteImagesDocument = gql`
   mutation deleteImages($ids: [String!]!) {

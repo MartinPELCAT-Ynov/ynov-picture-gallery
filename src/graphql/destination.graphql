@@ -1,0 +1,23 @@
+mutation createDestination(
+  $traveld: String!
+  $arrivalDate: DateTime!
+  $departureDate: DateTime!
+  $geohash: String!
+  $name: String!
+) {
+  createDestination(
+    travelId: $traveld
+    dest: {
+      arrivalDate: $arrivalDate
+      departureDate: $departureDate
+      geohash: $geohash
+      name: $name
+    }
+  ) {
+    uuid
+    geohash
+    arrivalDate
+    departureDate
+    name
+  }
+}
