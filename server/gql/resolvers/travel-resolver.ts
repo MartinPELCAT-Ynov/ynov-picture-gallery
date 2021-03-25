@@ -23,6 +23,7 @@ import {
 } from "../entity/ReactionEntitiy";
 import { Travel } from "../entity/Travel";
 import { User } from "../entity/User";
+import { CreateDestinationInput } from "../inputs/destination-input";
 import { CreateTravelInput } from "../inputs/travel-input";
 
 @Resolver(() => Travel)
@@ -32,7 +33,9 @@ export class TravelResolver implements ReactionEntitiyResolver {
     @InjectRepository(Travel)
     private readonly travelRepository: Repository<Travel>,
     @InjectRepository(Album)
-    private readonly albumRepository: Repository<Travel>
+    private readonly albumRepository: Repository<Travel>,
+    @InjectRepository(Destination)
+    private readonly destinationRepository: Repository<Destination>
   ) {}
 
   @Query(() => [Travel])
@@ -72,6 +75,27 @@ export class TravelResolver implements ReactionEntitiyResolver {
       .where("reactionentity.uuid = :id", { id })
       .getOneOrFail();
     return travel;
+  }
+
+  @Mutation(() => Destination)
+  @Authorized()
+  async createDestination(
+    @Arg("travelId") travelId: string,
+    @Arg("dest") destination: CreateDestinationInput,
+    @Ctx() { session }: KoaContext
+  ) {
+    const owner = session!.user as User;
+    const newDestination = this.destinationRepository.create({
+      entity: ReactionEntity.create({ owner }),
+      arrivalDate: destination.arrivalDate,
+      departureDate: destination.departureDate,
+      geohash: destination.geohash,
+      name: destination.name,
+      travel: (travelId as unknown) as Travel,
+      illu: [],
+    });
+
+    return this.destinationRepository.save(newDestination);
   }
 
   @FieldResolver(() => [Like])

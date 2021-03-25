@@ -1,6 +1,7 @@
 import { NonEmptyArray } from "type-graphql";
 import { AlbumResolver } from "./album-resolver";
 import { AuthResolver } from "./auth-resolver";
+import { DestinationResolver } from "./destination-resolver";
 import { PhotoResolver } from "./photo-resolver";
 import { TravelResolver } from "./travel-resolver";
 import { UserResolver } from "./user-resolver";
@@ -11,4 +12,5 @@ export const resolvers: NonEmptyArray<Function> | NonEmptyArray<string> = [
   TravelResolver,
   AlbumResolver,
   PhotoResolver,
+  DestinationResolver,
 ];
