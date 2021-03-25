@@ -11,10 +11,11 @@ import {
   Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Repository } from "typeorm";
+import { getRepository, Repository } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { Album } from "../entity/Album";
 import { Comment } from "../entity/Comment";
+import { Destination } from "../entity/Destination";
 import { Like } from "../entity/Like";
 import {
   ReactionEntitiyResolver,
@@ -90,6 +91,13 @@ export class TravelResolver implements ReactionEntitiyResolver {
       where: { travel: travel.uuid },
     });
     return count;
+  }
+
+  @FieldResolver(() => [Destination])
+  async destinations(@Root() destination: Destination) {
+    const destRepo = getRepository(Destination);
+    const dests = destRepo.find({ where: { travel: destination.uuid } });
+    return dests;
   }
 
   @FieldResolver(() => Int)

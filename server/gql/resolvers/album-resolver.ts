@@ -131,13 +131,17 @@ export class AlbumResolver {
 
     const curentAlbum = await this.albumRepository
       .createQueryBuilder("album")
-      .leftJoinAndSelect("album.photos", "photo")
       .leftJoin("album.entity", "reactionentity")
+      .leftJoinAndSelect("album.photos", "photos")
       .where("reactionentity.uuid = :albumUuid", { albumUuid })
       .getOne();
-    if (!curentAlbum) throw new Error("Cannot find album: " + album.entity);
 
-    return this.storageService.getPhotos(await curentAlbum.photos);
+    if (!curentAlbum) throw new Error("Cannot find album: " + album.uuid);
+
+    const albumPhotos = await curentAlbum.photos;
+    const photos = albumPhotos.filter((ph) => !!ph.url);
+
+    return this.storageService.getPhotos(photos);
   }
 
   @FieldResolver(() => Int)

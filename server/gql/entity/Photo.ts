@@ -6,11 +6,16 @@ import { ReactionEntity } from "./ReactionEntitiy";
 @ObjectType()
 @Entity()
 export class Photo {
-  @OneToOne(() => ReactionEntity, { lazy: true, primary: true, cascade: true })
+  @OneToOne(() => ReactionEntity, {
+    lazy: true,
+    primary: true,
+    cascade: true,
+    onDelete: "CASCADE",
+  })
   @JoinColumn()
   entity!: Lazy<ReactionEntity>;
 
-  @RelationId((album: Photo) => album.entity)
+  @RelationId((photo: Photo) => photo.entity)
   @Field()
   uuid?: string;
 
@@ -18,7 +23,7 @@ export class Photo {
   @Column()
   name!: string;
 
-  @Column()
+  @Column({ unique: true })
   @Field()
   url!: string;
 

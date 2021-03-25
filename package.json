@@ -1,6 +1,6 @@
 {
-  "name": "custom-server-typescript",
-  "version": "1.0.0",
+  "name": "ynov-gallery-picture",
+  "version": "0.1.0",
   "scripts": {
     "dev": "nodemon",
     "build": "next build && tsc --project tsconfig.server.json",
@@ -8,7 +8,6 @@
     "deploy": "sudo cross-env NODE_ENV=production pm2 start dist/index.js -i 4 --wait-ready",
     "delete:all": "pm2 delete all",
     "reload:all": "pm2 reload all",
-    "pm2:dev": "sudo cross-env NODE_ENV=development pm2 start server/index.ts --name wordpress -i 4 --watch --wait-ready",
     "generate:gql": "graphql-codegen --config codegen.yml",
     "prepare": "husky install"
   },
