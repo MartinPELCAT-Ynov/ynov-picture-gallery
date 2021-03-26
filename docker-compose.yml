@@ -2,7 +2,7 @@ services:
   postgres_database:
     container_name: postgres-gallery-gallery
     image: postgres
-    restart: always
+    restart: unless-stopped
     ports:
       - "5433:5432"
     environment:
@@ -13,7 +13,7 @@ services:
   redis:
     container_name: redis-container-gallery
     image: redis
-    restart: always
+    restart: unless-stopped
     ports:
       - 6380:6379
 
