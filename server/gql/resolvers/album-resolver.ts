@@ -24,10 +24,13 @@ import { Travel } from "../entity/Travel";
 import { User } from "../entity/User";
 import { Photo } from "../entity/Photo";
 import { ReactionEntity } from "../entity/ReactionEntitiy";
+import { createReactionEntityResolver } from "./abstract-reaction-entity-resolver";
+
+const AlbumEntityResolver = createReactionEntityResolver("album", Album);
 
 @Service()
 @Resolver(() => Album)
-export class AlbumResolver {
+export class AlbumResolver extends AlbumEntityResolver {
   constructor(
     @InjectRepository(Album)
     private readonly albumRepository: Repository<Album>,
@@ -36,7 +39,9 @@ export class AlbumResolver {
     @InjectRepository(Photo)
     private readonly photoRepository: Repository<Photo>,
     private readonly storageService: StorageService
-  ) {}
+  ) {
+    super();
+  }
 
   @Mutation(() => Album)
   @Authorized()

@@ -41,7 +41,7 @@ export default function Travel() {
             <div className="w-3/4 overflow-y-auto">
               <AlbumView />
             </div>
-            <div className="w-1/4 bg-gray-700">Column</div>
+            <div className="w-1/4 bg-gray-100">Column</div>
           </div>
           <Modal content={content} />
           <Modal content={inviteContent} />

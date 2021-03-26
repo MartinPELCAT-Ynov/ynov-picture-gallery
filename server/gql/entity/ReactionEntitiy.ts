@@ -18,15 +18,12 @@ export class ReactionEntity extends BaseEntity {
   @OneToMany(() => Like, (like) => like.entity, { lazy: true })
   likes!: Lazy<Like[]>;
 
-  @OneToMany(() => Comment, (comment) => comment.entity, { lazy: true })
+  @OneToMany(() => Comment, (comment) => comment.entity, {
+    lazy: true,
+    cascade: true,
+  })
   comments!: Lazy<Comment[]>;
 
   @ManyToOne(() => User, { lazy: true })
   owner!: Lazy<User>;
-}
-
-export interface ReactionEntitiyResolver {
-  likes(...args: any): Promise<Like[]>;
-  comments(...args: any): Promise<Comment[]>;
-  owner(...args: any): Promise<User>;
 }

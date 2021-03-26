@@ -5,15 +5,20 @@ import { getConnection, Repository } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { Photo } from "../entity/Photo";
 import { SucessObject } from "../inputs/sucess-object";
+import { createReactionEntityResolver } from "./abstract-reaction-entity-resolver";
+
+const PhotoEntityResolver = createReactionEntityResolver("photo", Photo);
 
 @Service()
 @Resolver(() => Photo)
-export class PhotoResolver {
+export class PhotoResolver extends PhotoEntityResolver {
   constructor(
     @InjectRepository(Photo)
     private readonly photoRepository: Repository<Photo>,
     private readonly storageService: StorageService
-  ) {}
+  ) {
+    super();
+  }
   @Mutation(() => SucessObject)
   @Authorized()
   async deletePhotos(

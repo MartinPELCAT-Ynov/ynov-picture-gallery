@@ -14,21 +14,19 @@ import { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { Album } from "../entity/Album";
-import { Comment } from "../entity/Comment";
 import { Destination } from "../entity/Destination";
-import { Like } from "../entity/Like";
-import {
-  ReactionEntitiyResolver,
-  ReactionEntity,
-} from "../entity/ReactionEntitiy";
+import { ReactionEntity } from "../entity/ReactionEntitiy";
 import { Travel } from "../entity/Travel";
 import { User } from "../entity/User";
 import { CreateDestinationInput } from "../inputs/destination-input";
 import { CreateTravelInput } from "../inputs/travel-input";
+import { createReactionEntityResolver } from "./abstract-reaction-entity-resolver";
+
+const TravelEntityResolver = createReactionEntityResolver("travel", Travel);
 
 @Resolver(() => Travel)
 @Service()
-export class TravelResolver implements ReactionEntitiyResolver {
+export class TravelResolver extends TravelEntityResolver {
   constructor(
     @InjectRepository(Travel)
     private readonly travelRepository: Repository<Travel>,
@@ -36,7 +34,9 @@ export class TravelResolver implements ReactionEntitiyResolver {
     private readonly albumRepository: Repository<Travel>,
     @InjectRepository(Destination)
     private readonly destinationRepository: Repository<Destination>
-  ) {}
+  ) {
+    super();
+  }
 
   @Query(() => [Travel])
   @Authorized()
@@ -98,17 +98,6 @@ export class TravelResolver implements ReactionEntitiyResolver {
     return this.destinationRepository.save(newDestination);
   }
 
-  @FieldResolver(() => [Like])
-  async likes(@Root() travel: Travel): Promise<Like[]> {
-    const entity = await travel.entity;
-    return entity.likes;
-  }
-  comments(): Promise<Comment[]> {
-    throw new Error("Method not implemented.");
-  }
-  owner(): Promise<User> {
-    throw new Error("Method not implemented.");
-  }
   @FieldResolver(() => Int)
   async albumsCount(@Root() travel: Travel) {
     const count = await this.albumRepository.count({
