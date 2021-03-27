@@ -4,7 +4,6 @@ import {
   Ctx,
   FieldResolver,
   Int,
-  Mutation,
   Resolver,
   Root,
 } from "type-graphql";
@@ -13,7 +12,6 @@ import { Like } from "../entity/Like";
 import { ReactionEntity } from "../entity/ReactionEntitiy";
 import { User } from "../entity/User";
 import { Comment } from "../entity/Comment";
-import { SucessObject } from "../inputs/sucess-object";
 
 export function createReactionEntityResolver<T extends ClassType<any>>(
   _suffix: string,
@@ -43,12 +41,6 @@ export function createReactionEntityResolver<T extends ClassType<any>>(
     async likes(@Root() entity: any) {
       return getRepository(Like).count({ where: { entity: entity.uuid } });
     }
-
-    @Mutation(() => SucessObject)
-    async dislike() {}
-
-    @Mutation(() => SucessObject)
-    async like() {}
   }
 
   return AbstractReactionEntityResolver;
