@@ -4,6 +4,8 @@ import { AlbumsView } from "src/components/albums/albums-view";
 import { Button } from "src/components/forms/Button";
 import { PreviouIcon } from "src/components/icons/PreviouIcon";
 import { Modal } from "src/components/Modal";
+import { CommentColumn } from "src/components/reactions/comment-column";
+import { LikeBanner } from "src/components/reactions/like-banner";
 import { AlbumsContextProvider } from "src/contexts/albums-context";
 import {
   TravelContext,
@@ -24,30 +26,47 @@ export default function Travel() {
     <Layout>
       <TravelContextProvider>
         <AlbumsContextProvider>
-          <TravelContext.Consumer>
-            {({ travel }) => (
-              <>
-                <div className="divide-y">
-                  <div className="px-10 py-5 flex justify-between items-center">
-                    <span className="text-4xl font-light flex items-center space-x-4">
-                      <PreviouIcon />
-                      <span className="italic font-medium">{travel?.name}</span>
-                    </span>
-                    <div className="flex space-x-4">
-                      <Button.Create
-                        label="Ajouter une destination"
-                        onClick={showDestinationModal}
-                      />
-                      <Button.Create label="Create album" onClick={show} />
-                    </div>
-                  </div>
-                  <AlbumsView />
-                </div>
-                <Modal content={contentDestinationModal} />
-                <Modal content={content} />
-              </>
-            )}
-          </TravelContext.Consumer>
+          <div className="px-10 py-5 flex justify-between items-center">
+            <span className="text-4xl font-light flex items-center space-x-4">
+              <PreviouIcon />
+              <TravelContext.Consumer>
+                {({ travel }) => (
+                  <span className="italic font-medium">{travel?.name}</span>
+                )}
+              </TravelContext.Consumer>
+            </span>
+            <div className="flex space-x-4">
+              <Button.Create
+                label="Ajouter une destination"
+                onClick={showDestinationModal}
+              />
+              <Button.Create label="Create album" onClick={show} />
+            </div>
+          </div>
+          <div className="flex h-full w-full flex-1">
+            <div className="w-3/4 overflow-y-auto">
+              <AlbumsView />
+            </div>
+            <div className="w-1/4 bg-gray-100">
+              <TravelContext.Consumer>
+                {({ travel }) => (
+                  <>
+                    <LikeBanner
+                      liked={travel?.liked ?? false}
+                      likes={travel?.likes ?? 0}
+                      entityUuid={travel?.uuid}
+                    />
+                    <CommentColumn
+                      entityUuid={travel?.uuid}
+                      comments={travel?.comments}
+                    />
+                  </>
+                )}
+              </TravelContext.Consumer>
+            </div>
+          </div>
+          <Modal content={contentDestinationModal} />
+          <Modal content={content} />
         </AlbumsContextProvider>
       </TravelContextProvider>
     </Layout>

@@ -8,6 +8,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
   { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
   { [SubKey in K]: Maybe<T[SubKey]> };
+const defaultOptions = {};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -44,6 +45,9 @@ export type Album = {
   isPublic: Scalars["Boolean"];
   name: Scalars["String"];
   travel: Array<Travel>;
+  comments: Array<Comment>;
+  liked: Scalars["Boolean"];
+  likes: Scalars["Int"];
   photos: Array<Photo>;
   photoCount: Scalars["Int"];
   owner: User;
@@ -55,15 +59,20 @@ export type Travel = {
   name: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
   albums: Array<Album>;
-  likes: Array<Like>;
+  comments: Array<Comment>;
+  liked: Scalars["Boolean"];
+  likes: Scalars["Int"];
   albumsCount: Scalars["Int"];
   destinations: Array<Destination>;
   likeCounts: Scalars["Int"];
 };
 
-export type Like = {
-  __typename?: "Like";
-  user: User;
+export type Comment = {
+  __typename?: "Comment";
+  uuid: Scalars["String"];
+  content: Scalars["String"];
+  createdAt: Scalars["String"];
+  user?: Maybe<User>;
 };
 
 export type User = {
@@ -83,6 +92,9 @@ export type Destination = {
   geohash: Scalars["String"];
   travel: Travel;
   illu: Array<Photo>;
+  comments: Array<Comment>;
+  liked: Scalars["Boolean"];
+  likes: Scalars["Int"];
 };
 
 export type Photo = {
@@ -90,6 +102,9 @@ export type Photo = {
   uuid: Scalars["String"];
   name: Scalars["String"];
   url: Scalars["String"];
+  comments: Array<Comment>;
+  liked: Scalars["Boolean"];
+  likes: Scalars["Int"];
 };
 
 export type Mutation = {
@@ -101,6 +116,9 @@ export type Mutation = {
   logout: SucessObject;
   validateEmail: SucessObject;
   deletePhotos: SucessObject;
+  addComment: Comment;
+  removeComment: SucessObject;
+  toggleLike: SucessObject;
   createTravel?: Maybe<Travel>;
   createDestination: Destination;
 };
@@ -128,6 +146,19 @@ export type MutationValidateEmailArgs = {
 
 export type MutationDeletePhotosArgs = {
   photoIds: Array<Scalars["String"]>;
+};
+
+export type MutationAddCommentArgs = {
+  entityId: Scalars["String"];
+  content: Scalars["String"];
+};
+
+export type MutationRemoveCommentArgs = {
+  commentUuid: Scalars["String"];
+};
+
+export type MutationToggleLikeArgs = {
+  entityUuid: Scalars["String"];
 };
 
 export type MutationCreateTravelArgs = {
@@ -189,12 +220,13 @@ export type GetAlbumQueryVariables = Exact<{
 export type GetAlbumQuery = { __typename?: "Query" } & {
   album: { __typename?: "Album" } & Pick<
     Album,
-    "photoCount" | "uuid" | "name"
+    "photoCount" | "uuid" | "name" | "likes" | "liked"
   > & {
       photos: Array<
         { __typename?: "Photo" } & Pick<Photo, "url" | "uuid" | "name">
       >;
       owner: { __typename?: "User" } & Pick<User, "firstName" | "lastName">;
+      comments: Array<{ __typename?: "Comment" } & CommentFragmentFragment>;
     };
 };
 
@@ -287,6 +319,39 @@ export type DeleteImagesMutation = { __typename?: "Mutation" } & {
   deletePhotos: { __typename?: "SucessObject" } & Pick<SucessObject, "success">;
 };
 
+export type AddCommentMutationVariables = Exact<{
+  id: Scalars["String"];
+  content: Scalars["String"];
+}>;
+
+export type AddCommentMutation = { __typename?: "Mutation" } & {
+  addComment: { __typename?: "Comment" } & Pick<Comment, "uuid" | "content">;
+};
+
+export type RemoveCommentMutationVariables = Exact<{
+  commentUuid: Scalars["String"];
+}>;
+
+export type RemoveCommentMutation = { __typename?: "Mutation" } & {
+  removeComment: { __typename?: "SucessObject" } & Pick<
+    SucessObject,
+    "success"
+  >;
+};
+
+export type ToggleLikeMutationVariables = Exact<{
+  id: Scalars["String"];
+}>;
+
+export type ToggleLikeMutation = { __typename?: "Mutation" } & {
+  toggleLike: { __typename?: "SucessObject" } & Pick<SucessObject, "success">;
+};
+
+export type CommentFragmentFragment = { __typename?: "Comment" } & Pick<
+  Comment,
+  "uuid" | "content" | "createdAt"
+> & { user?: Maybe<{ __typename?: "User" } & Pick<User, "firstName">> };
+
 export type MyTravelsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MyTravelsQuery = { __typename?: "Query" } & {
@@ -314,8 +379,11 @@ export type GetTravelQueryVariables = Exact<{
 export type GetTravelQuery = { __typename?: "Query" } & {
   getTravel: { __typename?: "Travel" } & Pick<
     Travel,
-    "uuid" | "name" | "description"
-  > & { albums: Array<{ __typename?: "Album" } & PreviewAlbumFragment> };
+    "uuid" | "name" | "description" | "likes" | "liked"
+  > & {
+      albums: Array<{ __typename?: "Album" } & PreviewAlbumFragment>;
+      comments: Array<{ __typename?: "Comment" } & CommentFragmentFragment>;
+    };
 };
 
 export const PreviewAlbumFragmentDoc = gql`
@@ -331,6 +399,16 @@ export const UserFieldsFragmentDoc = gql`
     uuid
     firstName
     lastName
+  }
+`;
+export const CommentFragmentFragmentDoc = gql`
+  fragment commentFragment on Comment {
+    uuid
+    content
+    createdAt
+    user {
+      firstName
+    }
   }
 `;
 export const PreviewTravelFragmentDoc = gql`
@@ -378,9 +456,10 @@ export function useCreateAlbumMutation(
     CreateAlbumMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<CreateAlbumMutation, CreateAlbumMutationVariables>(
     CreateAlbumDocument,
-    baseOptions
+    options
   );
 }
 export type CreateAlbumMutationHookResult = ReturnType<
@@ -406,8 +485,14 @@ export const GetAlbumDocument = gql`
         firstName
         lastName
       }
+      comments {
+        ...commentFragment
+      }
+      likes
+      liked
     }
   }
+  ${CommentFragmentFragmentDoc}
 `;
 
 /**
@@ -429,9 +514,10 @@ export const GetAlbumDocument = gql`
 export function useGetAlbumQuery(
   baseOptions: Apollo.QueryHookOptions<GetAlbumQuery, GetAlbumQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<GetAlbumQuery, GetAlbumQueryVariables>(
     GetAlbumDocument,
-    baseOptions
+    options
   );
 }
 export function useGetAlbumLazyQuery(
@@ -440,9 +526,10 @@ export function useGetAlbumLazyQuery(
     GetAlbumQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<GetAlbumQuery, GetAlbumQueryVariables>(
     GetAlbumDocument,
-    baseOptions
+    options
   );
 }
 export type GetAlbumQueryHookResult = ReturnType<typeof useGetAlbumQuery>;
@@ -495,10 +582,11 @@ export function useUploadPhotoAlbumMutation(
     UploadPhotoAlbumMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     UploadPhotoAlbumMutation,
     UploadPhotoAlbumMutationVariables
-  >(UploadPhotoAlbumDocument, baseOptions);
+  >(UploadPhotoAlbumDocument, options);
 }
 export type UploadPhotoAlbumMutationHookResult = ReturnType<
   typeof useUploadPhotoAlbumMutation
@@ -535,15 +623,14 @@ export const MeDocument = gql`
 export function useMeQuery(
   baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>
 ) {
-  return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
 }
 export function useMeLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>
 ) {
-  return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(
-    MeDocument,
-    baseOptions
-  );
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
 }
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
@@ -585,9 +672,10 @@ export function useLoginMutation(
     LoginMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<LoginMutation, LoginMutationVariables>(
     LoginDocument,
-    baseOptions
+    options
   );
 }
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
@@ -646,9 +734,10 @@ export function useRegisterMutation(
     RegisterMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(
     RegisterDocument,
-    baseOptions
+    options
   );
 }
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
@@ -691,9 +780,10 @@ export function useLogoutMutation(
     LogoutMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(
     LogoutDocument,
-    baseOptions
+    options
   );
 }
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
@@ -737,10 +827,11 @@ export function useValidateEmailMutation(
     ValidateEmailMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     ValidateEmailMutation,
     ValidateEmailMutationVariables
-  >(ValidateEmailDocument, baseOptions);
+  >(ValidateEmailDocument, options);
 }
 export type ValidateEmailMutationHookResult = ReturnType<
   typeof useValidateEmailMutation
@@ -807,10 +898,11 @@ export function useCreateDestinationMutation(
     CreateDestinationMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     CreateDestinationMutation,
     CreateDestinationMutationVariables
-  >(CreateDestinationDocument, baseOptions);
+  >(CreateDestinationDocument, options);
 }
 export type CreateDestinationMutationHookResult = ReturnType<
   typeof useCreateDestinationMutation
@@ -855,10 +947,11 @@ export function useDeleteImagesMutation(
     DeleteImagesMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     DeleteImagesMutation,
     DeleteImagesMutationVariables
-  >(DeleteImagesDocument, baseOptions);
+  >(DeleteImagesDocument, options);
 }
 export type DeleteImagesMutationHookResult = ReturnType<
   typeof useDeleteImagesMutation
@@ -867,6 +960,155 @@ export type DeleteImagesMutationResult = Apollo.MutationResult<DeleteImagesMutat
 export type DeleteImagesMutationOptions = Apollo.BaseMutationOptions<
   DeleteImagesMutation,
   DeleteImagesMutationVariables
+>;
+export const AddCommentDocument = gql`
+  mutation AddComment($id: String!, $content: String!) {
+    addComment(entityId: $id, content: $content) {
+      uuid
+      content
+    }
+  }
+`;
+export type AddCommentMutationFn = Apollo.MutationFunction<
+  AddCommentMutation,
+  AddCommentMutationVariables
+>;
+
+/**
+ * __useAddCommentMutation__
+ *
+ * To run a mutation, you first call `useAddCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addCommentMutation, { data, loading, error }] = useAddCommentMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      content: // value for 'content'
+ *   },
+ * });
+ */
+export function useAddCommentMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    AddCommentMutation,
+    AddCommentMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<AddCommentMutation, AddCommentMutationVariables>(
+    AddCommentDocument,
+    options
+  );
+}
+export type AddCommentMutationHookResult = ReturnType<
+  typeof useAddCommentMutation
+>;
+export type AddCommentMutationResult = Apollo.MutationResult<AddCommentMutation>;
+export type AddCommentMutationOptions = Apollo.BaseMutationOptions<
+  AddCommentMutation,
+  AddCommentMutationVariables
+>;
+export const RemoveCommentDocument = gql`
+  mutation RemoveComment($commentUuid: String!) {
+    removeComment(commentUuid: $commentUuid) {
+      success
+    }
+  }
+`;
+export type RemoveCommentMutationFn = Apollo.MutationFunction<
+  RemoveCommentMutation,
+  RemoveCommentMutationVariables
+>;
+
+/**
+ * __useRemoveCommentMutation__
+ *
+ * To run a mutation, you first call `useRemoveCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeCommentMutation, { data, loading, error }] = useRemoveCommentMutation({
+ *   variables: {
+ *      commentUuid: // value for 'commentUuid'
+ *   },
+ * });
+ */
+export function useRemoveCommentMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RemoveCommentMutation,
+    RemoveCommentMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RemoveCommentMutation,
+    RemoveCommentMutationVariables
+  >(RemoveCommentDocument, options);
+}
+export type RemoveCommentMutationHookResult = ReturnType<
+  typeof useRemoveCommentMutation
+>;
+export type RemoveCommentMutationResult = Apollo.MutationResult<RemoveCommentMutation>;
+export type RemoveCommentMutationOptions = Apollo.BaseMutationOptions<
+  RemoveCommentMutation,
+  RemoveCommentMutationVariables
+>;
+export const ToggleLikeDocument = gql`
+  mutation ToggleLike($id: String!) {
+    toggleLike(entityUuid: $id) {
+      success
+    }
+  }
+`;
+export type ToggleLikeMutationFn = Apollo.MutationFunction<
+  ToggleLikeMutation,
+  ToggleLikeMutationVariables
+>;
+
+/**
+ * __useToggleLikeMutation__
+ *
+ * To run a mutation, you first call `useToggleLikeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useToggleLikeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [toggleLikeMutation, { data, loading, error }] = useToggleLikeMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useToggleLikeMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ToggleLikeMutation,
+    ToggleLikeMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<ToggleLikeMutation, ToggleLikeMutationVariables>(
+    ToggleLikeDocument,
+    options
+  );
+}
+export type ToggleLikeMutationHookResult = ReturnType<
+  typeof useToggleLikeMutation
+>;
+export type ToggleLikeMutationResult = Apollo.MutationResult<ToggleLikeMutation>;
+export type ToggleLikeMutationOptions = Apollo.BaseMutationOptions<
+  ToggleLikeMutation,
+  ToggleLikeMutationVariables
 >;
 export const MyTravelsDocument = gql`
   query myTravels {
@@ -895,9 +1137,10 @@ export const MyTravelsDocument = gql`
 export function useMyTravelsQuery(
   baseOptions?: Apollo.QueryHookOptions<MyTravelsQuery, MyTravelsQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<MyTravelsQuery, MyTravelsQueryVariables>(
     MyTravelsDocument,
-    baseOptions
+    options
   );
 }
 export function useMyTravelsLazyQuery(
@@ -906,9 +1149,10 @@ export function useMyTravelsLazyQuery(
     MyTravelsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<MyTravelsQuery, MyTravelsQueryVariables>(
     MyTravelsDocument,
-    baseOptions
+    options
   );
 }
 export type MyTravelsQueryHookResult = ReturnType<typeof useMyTravelsQuery>;
@@ -956,10 +1200,11 @@ export function useCreateTravelMutation(
     CreateTravelMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     CreateTravelMutation,
     CreateTravelMutationVariables
-  >(CreateTravelDocument, baseOptions);
+  >(CreateTravelDocument, options);
 }
 export type CreateTravelMutationHookResult = ReturnType<
   typeof useCreateTravelMutation
@@ -978,9 +1223,15 @@ export const GetTravelDocument = gql`
       albums {
         ...previewAlbum
       }
+      comments {
+        ...commentFragment
+      }
+      likes
+      liked
     }
   }
   ${PreviewAlbumFragmentDoc}
+  ${CommentFragmentFragmentDoc}
 `;
 
 /**
@@ -1002,9 +1253,10 @@ export const GetTravelDocument = gql`
 export function useGetTravelQuery(
   baseOptions: Apollo.QueryHookOptions<GetTravelQuery, GetTravelQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<GetTravelQuery, GetTravelQueryVariables>(
     GetTravelDocument,
-    baseOptions
+    options
   );
 }
 export function useGetTravelLazyQuery(
@@ -1013,9 +1265,10 @@ export function useGetTravelLazyQuery(
     GetTravelQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<GetTravelQuery, GetTravelQueryVariables>(
     GetTravelDocument,
-    baseOptions
+    options
   );
 }
 export type GetTravelQueryHookResult = ReturnType<typeof useGetTravelQuery>;

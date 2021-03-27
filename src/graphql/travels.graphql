@@ -25,5 +25,10 @@ query getTravel($id: String!) {
     albums {
       ...previewAlbum
     }
+    comments {
+      ...commentFragment
+    }
+    likes
+    liked
   }
 }

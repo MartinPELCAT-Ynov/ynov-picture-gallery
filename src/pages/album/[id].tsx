@@ -4,6 +4,8 @@ import { AlbumView } from "src/components/album/album-view";
 import { Button } from "src/components/forms/Button";
 import { PreviouIcon } from "src/components/icons/PreviouIcon";
 import { Modal } from "src/components/Modal";
+import { CommentColumn } from "src/components/reactions/comment-column";
+import { LikeBanner } from "src/components/reactions/like-banner";
 import { AlbumContext, AlbumContextProvider } from "src/contexts/album-context";
 import { TravelContextProvider } from "src/contexts/travel-context";
 import { useModal } from "src/hooks/useModal";
@@ -41,7 +43,23 @@ export default function Travel() {
             <div className="w-3/4 overflow-y-auto">
               <AlbumView />
             </div>
-            <div className="w-1/4 bg-gray-100">Column</div>
+            <div className="w-1/4 bg-gray-100">
+              <AlbumContext.Consumer>
+                {({ album }) => (
+                  <>
+                    <LikeBanner
+                      liked={album?.liked ?? false}
+                      likes={album?.likes ?? 0}
+                      entityUuid={album?.uuid}
+                    />
+                    <CommentColumn
+                      comments={album?.comments}
+                      entityUuid={album?.uuid}
+                    />
+                  </>
+                )}
+              </AlbumContext.Consumer>
+            </div>
           </div>
           <Modal content={content} />
           <Modal content={inviteContent} />

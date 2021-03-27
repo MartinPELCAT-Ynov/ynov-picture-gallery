@@ -15,7 +15,7 @@ export class ReactionEntityResolver {
   @Authorized()
   async addComment(
     @Arg("content") content: string,
-    @Arg("albumId") entityId: string,
+    @Arg("entityId") entityId: string,
     @Ctx() { session }: KoaContext
   ) {
     const user = session!.user as User;
@@ -51,7 +51,7 @@ export class ReactionEntityResolver {
       .delete()
       .from(Comment)
       .where("comment.user = :userUuid", { userUuid: sessionUser.uuid })
-      .where("uuid = :uuid", { uuid: commentUuid })
+      .andWhere("uuid = :uuid", { uuid: commentUuid })
       .execute();
 
     return { success: true };
@@ -59,7 +59,7 @@ export class ReactionEntityResolver {
 
   @Mutation(() => SucessObject)
   @Authorized()
-  async toogleLike(
+  async toggleLike(
     @Arg("entityUuid") entityUuid: string,
     @Ctx() { session }: KoaContext
   ): Promise<SucessObject> {
@@ -75,10 +75,13 @@ export class ReactionEntityResolver {
 
     if (likeExist) {
       await likeRepo
-        .createQueryBuilder("like")
+        .createQueryBuilder()
         .delete()
-        .where("like.entity = :entityUuid", { entityUuid })
-        .andWhere("like.user = :userUuid", { userUuid: user.uuid })
+        .from(Like)
+        .where("entity = :entityUuid AND user = :userUuid", {
+          entityUuid,
+          userUuid: user.uuid,
+        })
         .execute();
 
       return { success: true };

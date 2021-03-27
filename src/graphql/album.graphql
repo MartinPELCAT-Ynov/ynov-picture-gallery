@@ -18,6 +18,11 @@ query getAlbum($id: String!) {
       firstName
       lastName
     }
+    comments {
+      ...commentFragment
+    }
+    likes
+    liked
   }
 }
 

@@ -1,0 +1,27 @@
+mutation AddComment($id: String!, $content: String!) {
+  addComment(entityId: $id, content: $content) {
+    uuid
+    content
+  }
+}
+
+mutation RemoveComment($commentUuid: String!) {
+  removeComment(commentUuid: $commentUuid) {
+    success
+  }
+}
+
+mutation ToggleLike($id: String!) {
+  toggleLike(entityUuid: $id) {
+    success
+  }
+}
+
+fragment commentFragment on Comment {
+  uuid
+  content
+  createdAt
+  user {
+    firstName
+  }
+}
