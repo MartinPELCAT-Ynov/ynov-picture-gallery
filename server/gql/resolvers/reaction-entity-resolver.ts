@@ -4,6 +4,7 @@ import { Arg, Authorized, Ctx, Mutation, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { getRepository, getConnection } from "typeorm";
 import { Comment } from "../entity/Comment";
+import { Like } from "../entity/Like";
 import { ReactionEntity } from "../entity/ReactionEntitiy";
 import { SucessObject } from "../inputs/sucess-object";
 
@@ -54,5 +55,42 @@ export class ReactionEntityResolver {
       .execute();
 
     return { success: true };
+  }
+
+  @Mutation(() => SucessObject)
+  @Authorized()
+  async toogleLike(
+    @Arg("entityUuid") entityUuid: string,
+    @Ctx() { session }: KoaContext
+  ): Promise<SucessObject> {
+    const user = session!.user as User;
+
+    const likeRepo = getRepository(Like);
+
+    const likeCount = await likeRepo.count({
+      where: { entity: entityUuid, user: user.uuid },
+    });
+
+    const likeExist = likeCount === 1;
+
+    if (likeExist) {
+      await likeRepo
+        .createQueryBuilder("like")
+        .delete()
+        .where("like.entity = :entityUuid", { entityUuid })
+        .andWhere("like.user = :userUuid", { userUuid: user.uuid })
+        .execute();
+
+      return { success: true };
+    } else {
+      const newLike = likeRepo.create({
+        entity: entityUuid as any,
+        user: user.uuid as any,
+      });
+
+      await likeRepo.save(newLike);
+
+      return { success: true };
+    }
   }
 }
