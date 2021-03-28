@@ -30,7 +30,6 @@ export const CreateDestinationModal = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
-      console.log("travelId = ", query.id);
       const datas = generateFormDatas<FormDatas>(e.currentTarget);
       const geohash = encode(selectedCity.lat, selectedCity.lon);
       await createDestination({
@@ -52,8 +51,6 @@ export const CreateDestinationModal = () => {
         `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&city=${e.target.value}`,
         { headers: { "Access-Control-Allow-Origin": "GET" } }
       );
-
-      console.log(data);
       setCities(data);
       setShowDropDown(true);
       setDebounce(null);

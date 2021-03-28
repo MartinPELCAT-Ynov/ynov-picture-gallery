@@ -32,7 +32,7 @@ export const PhotoPreview = (photo: PhotoProp) => {
       deletePhoto(photo);
     } catch (error) {
       //DO NOHING
-      console.log(error);
+      console.error(error);
     }
   };
 
