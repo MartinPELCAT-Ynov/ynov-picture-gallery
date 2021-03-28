@@ -32,7 +32,9 @@ const MapDestination = ({ destinations }: Props) => {
               key={dest.uuid}
               position={[position.latitude, position.longitude]}
             >
-              <Popup>{dest.name}</Popup>
+              <Popup>
+                <a href={`/destination/${dest.uuid}`}>{dest.name}</a>
+              </Popup>
             </Marker>
           );
         })}

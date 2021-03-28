@@ -111,6 +111,7 @@ export type Mutation = {
   __typename?: "Mutation";
   createAlbum: Album;
   addPhotosToAlbum: Album;
+  changePublic: SucessObject;
   login: User;
   register: SucessObject;
   logout: SucessObject;
@@ -129,6 +130,10 @@ export type MutationCreateAlbumArgs = {
 
 export type MutationAddPhotosToAlbumArgs = {
   files: Array<Scalars["Upload"]>;
+  albumUuid: Scalars["String"];
+};
+
+export type MutationChangePublicArgs = {
   albumUuid: Scalars["String"];
 };
 
@@ -175,14 +180,14 @@ export type CreateAlbumInput = {
   name: Scalars["String"];
 };
 
-export type LoginInput = {
-  email: Scalars["String"];
-  password: Scalars["String"];
-};
-
 export type SucessObject = {
   __typename?: "SucessObject";
   success: Scalars["Boolean"];
+};
+
+export type LoginInput = {
+  email: Scalars["String"];
+  password: Scalars["String"];
 };
 
 export type RegisterInput = {
@@ -220,7 +225,7 @@ export type GetAlbumQueryVariables = Exact<{
 export type GetAlbumQuery = { __typename?: "Query" } & {
   album: { __typename?: "Album" } & Pick<
     Album,
-    "photoCount" | "uuid" | "name" | "likes" | "liked"
+    "photoCount" | "uuid" | "name" | "isPublic" | "likes" | "liked"
   > & {
       photos: Array<
         { __typename?: "Photo" } & Pick<Photo, "url" | "uuid" | "name">
@@ -247,6 +252,14 @@ export type PreviewAlbumFragment = { __typename?: "Album" } & Pick<
   Album,
   "name" | "uuid" | "isPublic" | "photoCount"
 >;
+
+export type ChangePublicAccesMutationVariables = Exact<{
+  id: Scalars["String"];
+}>;
+
+export type ChangePublicAccesMutation = { __typename?: "Mutation" } & {
+  changePublic: { __typename?: "SucessObject" } & Pick<SucessObject, "success">;
+};
 
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -491,6 +504,7 @@ export const GetAlbumDocument = gql`
       photoCount
       uuid
       name
+      isPublic
       photos {
         url
         uuid
@@ -610,6 +624,55 @@ export type UploadPhotoAlbumMutationResult = Apollo.MutationResult<UploadPhotoAl
 export type UploadPhotoAlbumMutationOptions = Apollo.BaseMutationOptions<
   UploadPhotoAlbumMutation,
   UploadPhotoAlbumMutationVariables
+>;
+export const ChangePublicAccesDocument = gql`
+  mutation ChangePublicAcces($id: String!) {
+    changePublic(albumUuid: $id) {
+      success
+    }
+  }
+`;
+export type ChangePublicAccesMutationFn = Apollo.MutationFunction<
+  ChangePublicAccesMutation,
+  ChangePublicAccesMutationVariables
+>;
+
+/**
+ * __useChangePublicAccesMutation__
+ *
+ * To run a mutation, you first call `useChangePublicAccesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangePublicAccesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changePublicAccesMutation, { data, loading, error }] = useChangePublicAccesMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useChangePublicAccesMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ChangePublicAccesMutation,
+    ChangePublicAccesMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    ChangePublicAccesMutation,
+    ChangePublicAccesMutationVariables
+  >(ChangePublicAccesDocument, options);
+}
+export type ChangePublicAccesMutationHookResult = ReturnType<
+  typeof useChangePublicAccesMutation
+>;
+export type ChangePublicAccesMutationResult = Apollo.MutationResult<ChangePublicAccesMutation>;
+export type ChangePublicAccesMutationOptions = Apollo.BaseMutationOptions<
+  ChangePublicAccesMutation,
+  ChangePublicAccesMutationVariables
 >;
 export const MeDocument = gql`
   query Me {

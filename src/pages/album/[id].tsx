@@ -1,5 +1,5 @@
-import { GetServerSideProps } from "next";
 import React from "react";
+import { AlbumLockState } from "src/components/album/album-lock-state";
 import { AlbumView } from "src/components/album/album-view";
 import { Button } from "src/components/forms/Button";
 import { PreviouIcon } from "src/components/icons/PreviouIcon";
@@ -10,7 +10,6 @@ import { AlbumContext, AlbumContextProvider } from "src/contexts/album-context";
 import { TravelContextProvider } from "src/contexts/travel-context";
 import { useModal } from "src/hooks/useModal";
 import { Layout } from "src/layouts";
-import { withSession } from "src/middleware/withSession";
 import { InviteEmailModal } from "src/modals/invite-email-modal";
 import { UploadImageModal } from "src/modals/upload-image-modal";
 
@@ -28,8 +27,12 @@ export default function Travel() {
               <PreviouIcon />
               <AlbumContext.Consumer>
                 {({ album }) => (
-                  <span className="italic font-medium text-4xl">
-                    {album?.name}
+                  <span className="italic font-medium text-4xl flex items-center space-x-2">
+                    <AlbumLockState
+                      albumUuid={album?.uuid}
+                      isPublic={album?.isPublic || false}
+                    />
+                    <span>{album?.name}</span>
                   </span>
                 )}
               </AlbumContext.Consumer>
@@ -68,5 +71,3 @@ export default function Travel() {
     </Layout>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = withSession();

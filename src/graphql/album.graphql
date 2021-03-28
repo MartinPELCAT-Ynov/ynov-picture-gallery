@@ -9,6 +9,7 @@ query getAlbum($id: String!) {
     photoCount
     uuid
     name
+    isPublic
     photos {
       url
       uuid
@@ -42,4 +43,10 @@ fragment previewAlbum on Album {
   uuid
   isPublic
   photoCount
+}
+
+mutation ChangePublicAcces($id: String!) {
+  changePublic(albumUuid: $id) {
+    success
+  }
 }

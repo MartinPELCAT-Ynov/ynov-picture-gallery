@@ -25,6 +25,7 @@ import { User } from "../entity/User";
 import { Photo } from "../entity/Photo";
 import { ReactionEntity } from "../entity/ReactionEntitiy";
 import { createReactionEntityResolver } from "./abstract-reaction-entity-resolver";
+import { SucessObject } from "../inputs/sucess-object";
 
 const AlbumEntityResolver = createReactionEntityResolver("album", Album);
 
@@ -128,6 +129,34 @@ export class AlbumResolver extends AlbumEntityResolver {
       .add(photosSaved);
 
     return album;
+  }
+
+  @Mutation(() => SucessObject)
+  async changePublic(
+    @Arg("albumUuid") albumUuid: string
+  ): Promise<SucessObject> {
+    const album = await this.albumRepository.findOneOrFail({
+      where: { entity: albumUuid },
+    });
+
+    if (album.isPublic) {
+      await this.albumRepository
+        .createQueryBuilder()
+        .update(Album)
+        .set({ isPublic: false })
+        .where("entity = :id", { id: albumUuid })
+        .execute();
+
+      return { success: false };
+    } else {
+      await this.albumRepository
+        .createQueryBuilder()
+        .update(Album)
+        .set({ isPublic: true })
+        .where("entity = :id", { id: albumUuid })
+        .execute();
+      return { success: true };
+    }
   }
 
   @FieldResolver(() => [Photo])

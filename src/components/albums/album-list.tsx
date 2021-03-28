@@ -19,18 +19,6 @@ export const AlbumList = ({ albums }: Props) => {
         <MapDestination destinations={travel.destinations} />
       )}
       <div className="flex flex-wrap -m-4">
-        {travel?.destinations.map((destination) => (
-          <div key={destination.uuid} className="my-3 w-1/4">
-            <div className="mx-4 my-1 bg-white p-4 rounded-lg shadow h-full">
-              <span className="text-sm">Dest - {destination.name}</span>
-              <div className="text-xs italic text-gray-500">
-                {new Date(destination.arrivalDate).toLocaleDateString()} -{" "}
-                {new Date(destination.departureDate).toLocaleDateString()}
-              </div>
-            </div>
-          </div>
-        ))}
-
         {albums.map((albs) => (
           <AlbumItem {...albs} key={albs.uuid} />
         ))}
