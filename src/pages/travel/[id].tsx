@@ -15,13 +15,14 @@ import { useModal } from "src/hooks/useModal";
 import { Layout } from "src/layouts";
 import { withSession } from "src/middleware/withSession";
 import { CreateAlbumModal } from "src/modals/create-album-modal";
+import { CreateDestinationModal } from "src/modals/create-destination-modal";
 
 export default function Travel() {
   const { show, content } = useModal(<CreateAlbumModal />);
   const {
     show: showDestinationModal,
     content: contentDestinationModal,
-  } = useModal(<CreateAlbumModal />);
+  } = useModal(<CreateDestinationModal />);
   return (
     <Layout>
       <TravelContextProvider>

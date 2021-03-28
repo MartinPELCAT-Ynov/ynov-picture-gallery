@@ -297,7 +297,7 @@ export type ValidateEmailMutation = { __typename?: "Mutation" } & {
 };
 
 export type CreateDestinationMutationVariables = Exact<{
-  traveld: Scalars["String"];
+  travelId: Scalars["String"];
   arrivalDate: Scalars["DateTime"];
   departureDate: Scalars["DateTime"];
   geohash: Scalars["String"];
@@ -310,6 +310,11 @@ export type CreateDestinationMutation = { __typename?: "Mutation" } & {
     "uuid" | "geohash" | "arrivalDate" | "departureDate" | "name"
   >;
 };
+
+export type DestinationFragment = { __typename?: "Destination" } & Pick<
+  Destination,
+  "uuid" | "geohash" | "arrivalDate" | "departureDate" | "name"
+>;
 
 export type DeleteImagesMutationVariables = Exact<{
   ids: Array<Scalars["String"]> | Scalars["String"];
@@ -383,6 +388,7 @@ export type GetTravelQuery = { __typename?: "Query" } & {
   > & {
       albums: Array<{ __typename?: "Album" } & PreviewAlbumFragment>;
       comments: Array<{ __typename?: "Comment" } & CommentFragmentFragment>;
+      destinations: Array<{ __typename?: "Destination" } & DestinationFragment>;
     };
 };
 
@@ -399,6 +405,15 @@ export const UserFieldsFragmentDoc = gql`
     uuid
     firstName
     lastName
+  }
+`;
+export const DestinationFragmentDoc = gql`
+  fragment destination on Destination {
+    uuid
+    geohash
+    arrivalDate
+    departureDate
+    name
   }
 `;
 export const CommentFragmentFragmentDoc = gql`
@@ -843,14 +858,14 @@ export type ValidateEmailMutationOptions = Apollo.BaseMutationOptions<
 >;
 export const CreateDestinationDocument = gql`
   mutation createDestination(
-    $traveld: String!
+    $travelId: String!
     $arrivalDate: DateTime!
     $departureDate: DateTime!
     $geohash: String!
     $name: String!
   ) {
     createDestination(
-      travelId: $traveld
+      travelId: $travelId
       dest: {
         arrivalDate: $arrivalDate
         departureDate: $departureDate
@@ -884,7 +899,7 @@ export type CreateDestinationMutationFn = Apollo.MutationFunction<
  * @example
  * const [createDestinationMutation, { data, loading, error }] = useCreateDestinationMutation({
  *   variables: {
- *      traveld: // value for 'traveld'
+ *      travelId: // value for 'travelId'
  *      arrivalDate: // value for 'arrivalDate'
  *      departureDate: // value for 'departureDate'
  *      geohash: // value for 'geohash'
@@ -1226,12 +1241,16 @@ export const GetTravelDocument = gql`
       comments {
         ...commentFragment
       }
+      destinations {
+        ...destination
+      }
       likes
       liked
     }
   }
   ${PreviewAlbumFragmentDoc}
   ${CommentFragmentFragmentDoc}
+  ${DestinationFragmentDoc}
 `;
 
 /**

@@ -14,8 +14,8 @@ export const AlbumItem = ({
         <Link href={`/album/${uuid}`}>
           <a>
             <div className="flex flex-col justify-between h-full space-y-2">
-              <span className="uppercase line-clamp-1" title={name}>
-                {name}
+              <span className="text-sm line-clamp-1" title={name}>
+                Album - {name}
               </span>
               <div className="flex justify-between">
                 <div>{!isPublic ? <LockCloseIcon /> : <></>}</div>

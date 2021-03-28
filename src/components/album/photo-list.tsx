@@ -1,7 +1,9 @@
 import { Photo } from "src/__generated__";
 import { PhotoPreview } from "./photo-preview";
 
-type Props = { photos: Photo[] };
+export type PhotoProp = Pick<Photo, "url" | "uuid" | "name">;
+
+type Props = { photos: PhotoProp[] };
 
 export const PhotoList = ({ photos }: Props) => {
   return (

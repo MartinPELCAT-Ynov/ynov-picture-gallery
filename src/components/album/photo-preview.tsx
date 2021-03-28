@@ -2,10 +2,11 @@ import clsx from "clsx";
 import React, { MouseEventHandler, useContext, useRef, useState } from "react";
 import { useClickAway } from "react-use";
 import { AlbumContext } from "src/contexts/album-context";
-import { Photo, useDeleteImagesMutation } from "src/__generated__";
+import { useDeleteImagesMutation } from "src/__generated__";
 import { DeleteIcon } from "../icons/DeleteIcon";
+import { PhotoProp } from "./photo-list";
 
-export const PhotoPreview = (photo: Photo) => {
+export const PhotoPreview = (photo: PhotoProp) => {
   const contextMenuRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number }>({

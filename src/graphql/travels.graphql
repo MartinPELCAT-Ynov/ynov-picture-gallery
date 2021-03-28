@@ -28,6 +28,9 @@ query getTravel($id: String!) {
     comments {
       ...commentFragment
     }
+    destinations {
+      ...destination
+    }
     likes
     liked
   }

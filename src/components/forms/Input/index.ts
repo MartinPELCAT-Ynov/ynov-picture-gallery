@@ -4,7 +4,7 @@ import { TextArea } from "./text-area";
 export type InputProps = {
   label: string;
   type?: string;
-  name: string;
+  name?: string;
   placeholder?: string;
   required?: boolean;
   defaultValue?: string | number;

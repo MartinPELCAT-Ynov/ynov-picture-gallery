@@ -1,10 +1,11 @@
 import { createContext, Dispatch, FC, SetStateAction, useState } from "react";
+import { PhotoProp } from "src/components/album/photo-list";
 import { GetAlbumQuery, Photo } from "src/__generated__";
 
 type AlbumContextType = {
   album: GetAlbumQuery["album"] | null;
   setAlbum: Dispatch<SetStateAction<GetAlbumQuery["album"] | null>>;
-  deletePhoto(photo: Photo): void;
+  deletePhoto(photo: PhotoProp): void;
 };
 
 export const AlbumContext = createContext<AlbumContextType>(undefined!);
