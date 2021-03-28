@@ -18,19 +18,18 @@ export const LikeBanner = ({ likes, liked, entityUuid }: Props) => {
     setLikedState(liked);
   }, [liked]);
 
-  useEffect(() => {
-    if (likedState && !liked) {
-      setLikesCount((prev) => prev + 1);
-    } else if (!likedState && !liked) {
-      setLikesCount((prev) => (prev - 1 < 0 ? 0 : prev - 1));
-    }
-  }, [likedState]);
-
   const handleLikeClick = async () => {
     try {
-      await toggleLike({ variables: { id: entityUuid! } });
+      const { data } = await toggleLike({ variables: { id: entityUuid! } });
       setLikedState((prev) => !prev);
-    } catch (error) {}
+      if (data && data.toggleLike.success) {
+        setLikesCount((prev) => prev + 1);
+      } else if (data && !data.toggleLike.success) {
+        setLikesCount((prev) => prev - 1);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   if (!entityUuid) return null;

@@ -50,7 +50,7 @@ export class ReactionEntityResolver {
       .createQueryBuilder("comment")
       .delete()
       .from(Comment)
-      .where("comment.user = :userUuid", { userUuid: sessionUser.uuid })
+      .where("user = :userUuid", { userUuid: sessionUser.uuid })
       .andWhere("uuid = :uuid", { uuid: commentUuid })
       .execute();
 
@@ -84,7 +84,7 @@ export class ReactionEntityResolver {
         })
         .execute();
 
-      return { success: true };
+      return { success: false };
     } else {
       const newLike = likeRepo.create({
         entity: entityUuid as any,
