@@ -34,29 +34,30 @@ Enfin, une autre évolution du projet serait l’ajout d’un système de«likes
 
 # Use Case
 
-![Diagramme de classe](./docs/use-case.png)
+![Use case](./docs/use-case.png)
 
 # Diagramme Class
 
+On peut mettre un J'aime et un COmmentaire sur tous les éléments
+
 ![Diagramme de classe](./docs/class.png)
+
+# Diagramme de class storage
+
+Possibilité d'utiliser plusieurs strategies dans le meme server, par exemple les photo des albums dans firebase, les photos des destinations dans s3 et des photos de profils dans le local
+
+![ERD](./docs/sotackge-class.png)
 
 # Diagramme de déploiement
 
-![Diagramme de classe](./docs/deploy-diag.png)
+![Diagramme de deploiement](./docs/deploy-diag.png)
 
 # Base de données
 
-![Diagramme de classe](./docs/erd.png)
+![ERD](./docs/erd.png)
 
-# TODO
+# Diagramme de séquence
 
-- **`Affichage des photos`**
+Un utilisateur s'inscrit, recoit un email avec un lien d'activation, le compte est valide l'utilisateur peut donc se connecter
 
-  - Afficher une carte dans les voyages
-
-- **`Carousel Photo avec likes et commentaires`**
-
-  - Afficher une carte dans les voyages
-
-- **`Affichage les likes et commentaires des Album et travels`**
-  - Afficher une carte dans les voyages
+![ERD](./docs/sequence.png)
