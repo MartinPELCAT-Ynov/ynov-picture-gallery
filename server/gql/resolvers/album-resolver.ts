@@ -112,6 +112,7 @@ export class AlbumResolver extends AlbumEntityResolver {
     if (owner.uuid !== session?.user.uuid) throw new UnauthorizedError();
 
     const photos = await this.storageService.uploadPhotos(files);
+    //  await this.storageService.useStrategy("local").uploadPhotos(files)
 
     const allPhotos = photos.map((photo) => {
       return this.photoRepository.create({

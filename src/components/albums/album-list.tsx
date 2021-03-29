@@ -13,6 +13,8 @@ export type Props = { albums: PreviewAlbumFragment[] };
 export const AlbumList = ({ albums }: Props) => {
   const { travel } = useContext(TravelContext);
 
+  console.log(travel?.destinations);
+
   return (
     <div className="p-4">
       {travel?.destinations && (

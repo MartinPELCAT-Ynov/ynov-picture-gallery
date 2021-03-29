@@ -23,6 +23,7 @@ export abstract class StorageStrategy implements IStorageStrategy {
     });
     return path;
   }
+
   protected deleteTmpFile(filename: string) {
     const path = join(UPLOAD_TMP_FOLDER, filename);
     return promises.unlink(path);

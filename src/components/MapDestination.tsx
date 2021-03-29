@@ -13,6 +13,7 @@ const MapDestination = ({ destinations }: Props) => {
     return [position.latitude, position.longitude];
   });
 
+  if (destinations.length === 0) return null;
   return (
     <div className="w-full h-64 rounded-2xl overflow-hidden my-3 z-0">
       <MapContainer

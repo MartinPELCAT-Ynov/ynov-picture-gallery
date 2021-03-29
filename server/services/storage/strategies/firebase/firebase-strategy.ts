@@ -37,7 +37,7 @@ export class FirebaseStorageStrategy extends StorageStrategy {
         gzip: true,
       });
 
-      this.deleteTmpFile(fileName);
+      await this.deleteTmpFile(fileName);
 
       photos.push({ name: file.filename, url: fileName, provider: "firebase" });
     }
